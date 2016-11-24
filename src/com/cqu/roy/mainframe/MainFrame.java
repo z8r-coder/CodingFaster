@@ -79,7 +79,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		northjp.setSize(jp.getSize().width, 40);
 	
 		jsp = new JScrollPane();//滚轮
-		
+		jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
 		/*菜单*/
 		bar = new JMenuBar();
 		initFileMenu();
@@ -113,69 +113,10 @@ public class MainFrame extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getActionCommand().equals(ItemName.selectionName[0])) {// new file
-			int id;
-			if (close_id.size() == 0) {
-				id = untitled_vc.size() + 1;
-				untitled_vc.add(id);
-			}else {
-				id = close_id.get(0);//最先被关闭的id
-				close_id.remove((Integer)id);//该id已经被使用，移除！
-				untitled_vc.add(id);
-			}
-			TextAtrr textAtrr = new TextAtrr(false, id, "untitled" + id, null);
-			currentAreaName = "untitled" + id;
-			
-			hm_name_atrr.put(currentAreaName, textAtrr);
-			sequece_name.add(currentAreaName);
-			
-			jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
-			JTextArea jta = new JTextArea();
-			JButton switchbtn = new JButton(currentAreaName);
-			switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT);
-			northjp.add(switchbtn);
-			switchbtn.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if (currentAreaName != switchbtn.getText()) {
-						jsp.remove(hmTextArea.get(currentAreaName));
-						currentAreaName = switchbtn.getText();
-						currentButton = switchbtn;
-						jsp.setViewportView(hmTextArea.get(currentAreaName));
-						jsp.updateUI();
-					}
-				}
-			});
-			currentButton = switchbtn;
-			hm_name_btn.put(switchbtn.getText(), switchbtn);
-			hmTextArea.put(currentAreaName, jta);
-			
-			jp.add(jsp,BorderLayout.CENTER);
-
-			jsp.setViewportView(jta);
-			jp.updateUI();
-			northjp.updateUI();
+			newFile();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[1])) {//open file
-			JFileChooser jf = new JFileChooser();
-			JTextArea jta = new JTextArea();
-			jp.add(jsp,BorderLayout.CENTER);
-			jsp.setViewportView(jta);
-			
-			TextAtrr textAtrr;
-			
-			int value = jf.showOpenDialog(null);
-			if (value == JFileChooser.APPROVE_OPTION) {
-				jp.updateUI();
-				File file = jf.getSelectedFile();
-				textAtrr = new TextAtrr(true, 0, file.getName(), file.getPath());
-				hmTextArea.put(file.getName(), jta);
-				
-				currentAreaName = file.getName();
-				
-				if (file.isFile() && file.exists()) {
-					war.openFrom(file, jta);//写入程序
-				}
-			}
+			openOp();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[2])) {//open folder
 
@@ -184,50 +125,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[4])) {//save
-			TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
-			
-			if (hmTextArea.size() != 0 && (!textAtrr.getisSave())) {
-				JFileChooser jf = new JFileChooser();
-				int value = jf.showSaveDialog(null);
-				if (value == JFileChooser.APPROVE_OPTION) {
-					File file = jf.getSelectedFile();
-					/*当打开文件是第一次被保存时候，向hashmap中添加条目
-					 * 并且会弹出窗口选择*/
-					textAtrr.setFilename(file.getName());
-					textAtrr.setFileAddress(file.getPath());
-					textAtrr.setisSave(true);
-					war.saveTo(file, hmTextArea.get(currentAreaName).getText());//写入文件
-					JTextArea temp_area = hmTextArea.get(currentAreaName);
-					JButton temp_btn = hm_name_btn.get(currentAreaName);
-					TextAtrr temp_atrr = hm_name_atrr.get(currentAreaName);
-					
-					hmTextArea.remove(currentAreaName);
-					hm_name_atrr.remove(currentAreaName);
-					hm_name_btn.remove(currentAreaName);
-					
-					close_id.add(textAtrr.getID());//将该文本域的ID加入缺省ID集合
-					untitled_vc.remove(currentAreaName);
-					int index = sequece_name.indexOf(currentAreaName);
-					sequece_name.remove(index);
-					
-					currentAreaName = file.getName();
-					sequece_name.insertElementAt(currentAreaName, index);
-					
-					hmTextArea.put(currentAreaName, temp_area);
-					hm_name_atrr.put(currentAreaName, temp_atrr);
-					hm_name_btn.put(currentAreaName, temp_btn);
-					
-					currentButton.setText(file.getName());
-					for(int i = 0; i < sequece_name.size();i++){
-						System.out.println(sequece_name.get(i));
-					}
-				}
-			}else if (textAtrr.getisSave()) {
-				/*当文件并非第一次创建的时候，已经保存过了
-				 * 会弹出选择窗口*/
-				File file = new File(textAtrr.getFileAddress());
-				war.saveTo(file, hmTextArea.get(currentAreaName).getText());
-			}
+			saveOp();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[5])) {//save as
 			
@@ -242,44 +140,182 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close file
-			TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
-			if (!textAtrr.getisSave()) {//未保存
-				close_id.add(textAtrr.getID());
-				untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
-			}
-
-			jsp.remove(hmTextArea.get(currentAreaName));
-			northjp.remove(currentButton);
-
-			hm_name_atrr.remove(currentAreaName);
-			hmTextArea.remove(currentAreaName);
-			
-			int index = sequece_name.indexOf(currentAreaName);
-			if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
-				//do nothing
-			}
-			else if (index == sequece_name.size() - 1) {
-				sequece_name.remove(currentAreaName);
-				currentAreaName = sequece_name.get(sequece_name.size() - 1);
-				currentButton = hm_name_btn.get(currentAreaName);
-			}else {
-				sequece_name.remove(currentAreaName);
-				currentAreaName = sequece_name.get(index);
-				currentButton = hm_name_btn.get(currentAreaName);
-			}
-			jsp.setViewportView(hmTextArea.get(currentAreaName));
-			jp.updateUI();
+			closeFileOp();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//Close all file
-			jp.remove(jsp);
-			//jp.remove(northjp);
-			northjp.removeAll();
-			clearAllEl();
-			jp.updateUI();
+			clossAllFileOp();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[11])) {//exit
 			System.exit(0);
 		}
+	}
+	//new
+	private void newFile(){
+		int id;
+		if (close_id.size() == 0) {
+			id = untitled_vc.size() + 1;
+			untitled_vc.add(id);
+		}else {
+			id = close_id.get(0);//最先被关闭的id
+			close_id.remove((Integer)id);//该id已经被使用，移除！
+			untitled_vc.add(id);
+		}
+		TextAtrr textAtrr = new TextAtrr(false, id, "untitled" + id, null);
+		currentAreaName = "untitled" + id;
+		
+		hm_name_atrr.put(currentAreaName, textAtrr);
+		sequece_name.add(currentAreaName);
+
+		JTextArea jta = new JTextArea();
+		JButton switchbtn = new JButton(currentAreaName);
+		switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT);
+		northjp.add(switchbtn);
+		switchbtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentAreaName != switchbtn.getText()) {
+					jsp.remove(hmTextArea.get(currentAreaName));
+					currentAreaName = switchbtn.getText();
+					currentButton = switchbtn;
+					jsp.setViewportView(hmTextArea.get(currentAreaName));
+					jsp.updateUI();
+				}
+			}
+		});
+		currentButton = switchbtn;
+		hm_name_btn.put(switchbtn.getText(), switchbtn);
+		hmTextArea.put(currentAreaName, jta);
+		
+		jp.add(jsp,BorderLayout.CENTER);
+
+		jsp.setViewportView(jta);
+		jp.updateUI();
+		northjp.updateUI();
+	}
+	//save
+	private void saveOp(){
+
+		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
+		
+		if (hmTextArea.size() != 0 && (!textAtrr.getisSave())) {
+			JFileChooser jf = new JFileChooser();
+			int value = jf.showSaveDialog(null);
+			if (value == JFileChooser.APPROVE_OPTION) {
+				File file = jf.getSelectedFile();
+				/*当打开文件是第一次被保存时候，向hashmap中添加条目
+				 * 并且会弹出窗口选择*/
+				textAtrr.setFilename(file.getName());
+				textAtrr.setFileAddress(file.getPath());
+				textAtrr.setisSave(true);
+				war.saveTo(file, hmTextArea.get(currentAreaName).getText());//写入文件
+				JTextArea temp_area = hmTextArea.get(currentAreaName);
+				JButton temp_btn = hm_name_btn.get(currentAreaName);
+				TextAtrr temp_atrr = hm_name_atrr.get(currentAreaName);
+				
+				removeMap(currentAreaName);
+				
+				close_id.add(textAtrr.getID());//将该文本域的ID加入缺省ID集合
+				untitled_vc.remove(currentAreaName);
+				int index = sequece_name.indexOf(currentAreaName);
+				sequece_name.remove(index);
+				
+				currentAreaName = file.getName();
+				sequece_name.insertElementAt(currentAreaName, index);
+				
+				addMap(currentAreaName, temp_area, temp_btn, temp_atrr);
+				currentButton.setText(file.getName());
+			}
+		}else if (textAtrr.getisSave()) {
+			/*当文件并非第一次创建的时候，已经保存过了
+			 * 会弹出选择窗口*/
+			File file = new File(textAtrr.getFileAddress());
+			war.saveTo(file, hmTextArea.get(currentAreaName).getText());
+		}
+	}
+	//open
+	private void openOp(){
+		JFileChooser jf = new JFileChooser();
+		JTextArea jta = new JTextArea();
+		JButton btn = new JButton();
+		
+		TextAtrr textAtrr;
+		
+		int value = jf.showOpenDialog(null);
+		if (value == JFileChooser.APPROVE_OPTION) {
+			jp.updateUI();
+			File file = jf.getSelectedFile();
+			textAtrr = new TextAtrr(true, 0, file.getName(), file.getPath());
+			JTextArea finishWritenArea;
+			if (file.isFile() && file.exists()) {
+				finishWritenArea = war.openFrom(file, jta);//写入程序,返回值为已经写入文本的area
+				
+				jsp.setViewportView(finishWritenArea);
+				
+				currentAreaName = file.getName();
+				currentButton = btn;
+				
+				currentButton.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						if (currentAreaName != btn.getText()) {
+							jsp.remove(hmTextArea.get(currentAreaName));
+							currentAreaName = btn.getText();
+							currentButton = btn;
+							jsp.setViewportView(hmTextArea.get(currentAreaName));
+							jsp.updateUI();
+						}
+					}
+				});
+				
+				addMap(currentAreaName, finishWritenArea, btn, textAtrr);//添加属性
+				
+				btn.setText(currentAreaName);
+				
+				northjp.add(currentButton);
+				sequece_name.add(currentAreaName);
+				jp.add(jsp,BorderLayout.CENTER);
+				jsp.setViewportView(jta);
+			}
+		}
+	}
+	//close file
+	private void closeFileOp(){
+		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
+		if (!textAtrr.getisSave()) {//未保存
+			close_id.add(textAtrr.getID());
+			untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
+		}
+
+		jsp.remove(hmTextArea.get(currentAreaName));
+		northjp.remove(currentButton);
+
+		hm_name_atrr.remove(currentAreaName);
+		hmTextArea.remove(currentAreaName);
+		
+		int index = sequece_name.indexOf(currentAreaName);
+		if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
+			//do nothing
+		}
+		else if (index == sequece_name.size() - 1) {
+			sequece_name.remove(currentAreaName);
+			currentAreaName = sequece_name.get(sequece_name.size() - 1);
+			currentButton = hm_name_btn.get(currentAreaName);
+		}else {
+			sequece_name.remove(currentAreaName);
+			currentAreaName = sequece_name.get(index);
+			currentButton = hm_name_btn.get(currentAreaName);
+		}
+		jsp.setViewportView(hmTextArea.get(currentAreaName));
+		jp.updateUI();
+	}
+	//close all file 
+	private void clossAllFileOp(){
+		jp.remove(jsp);
+		northjp.removeAll();
+		clearAllEl();
+		jp.updateUI();
 	}
 	//当关闭页面上所有的page，需要clear所有需要维护的变量
 	private void clearAllEl(){
@@ -290,5 +326,17 @@ public class MainFrame extends JFrame implements ActionListener{
 		sequece_name.removeAllElements();
 		close_id.clear();
 		untitled_vc.clear();
+	}
+	
+	private void addMap(String name,JTextArea jTextArea,JButton btn,TextAtrr atrr){
+		hmTextArea.put(name, jTextArea);
+		hm_name_btn.put(name, btn);
+		hm_name_atrr.put(name, atrr);
+	}
+	
+	private void removeMap(String name){
+		hmTextArea.remove(name);
+		hm_name_atrr.remove(name);
+		hm_name_btn.remove(name);
 	}
 }

@@ -36,7 +36,7 @@ public class writeAndread {
 		}
 	}
 	
-	public void openFrom(File file,JTextArea jta) {
+	public JTextArea openFrom(File file,JTextArea jta) {
 		String lineText = null;
 		try {
 			InputStreamReader isr = new InputStreamReader(
@@ -60,5 +60,6 @@ public class writeAndread {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		return jta;
 	}
 }
