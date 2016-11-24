@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import com.cqu.roy.attribute.TextAtrr;
+import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.LenthAll;
 
@@ -50,17 +51,16 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	private String currentAreaName = null;//当前聚焦的文本
 	private JButton currentButton = null;//当前聚焦的文本按钮
-	private int fileNumber = 1;//打开了多少个文本
-	private int untitledFileNumber = 0;//有多少个未保存文本
 	
-	private final static String encoding = "UTF-8";
+	private writeAndread war = new writeAndread();
 	
+	//每次页面中发生变化，需要维护的变量
 	private HashMap<String,JTextArea> hmTextArea = new HashMap<>();//名字和文本域的映射
 	private HashMap<String, JButton> hm_name_btn = new HashMap<>();//名字和按钮的映射
 	private HashMap<String, TextAtrr> hm_name_atrr = new HashMap<>();//名字与具体对象的映射
 	private Vector<Integer> untitled_vc = new Vector<>();//未保存的id集合
-	private Vector<Integer> close_id = new Vector<>();//保留ID
-	private Vector<String> sequece_name = new Vector<>();//存储文件打开的序列;
+	private Vector<Integer> close_id = new Vector<>();//保留ID,如1234,把2关闭啦，close_id保存数字2,然后下一个new 的时候命名为2
+	private Vector<String> sequece_name = new Vector<>();//文件打开的序列;
 	
 	public MainFrame() {
 		// TODO Auto-generated constructor stub
@@ -77,8 +77,6 @@ public class MainFrame extends JFrame implements ActionListener{
 		northjp = new JPanel();
 		northjp.setLayout(gridLayout);
 		northjp.setSize(jp.getSize().width, 40);
-		
-		jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
 	
 		jsp = new JScrollPane();//滚轮
 		
@@ -115,13 +113,13 @@ public class MainFrame extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getActionCommand().equals(ItemName.selectionName[0])) {// new file
-			fileNumber++;
 			int id;
 			if (close_id.size() == 0) {
 				id = untitled_vc.size() + 1;
 				untitled_vc.add(id);
 			}else {
-				id = close_id.get(0);
+				id = close_id.get(0);//最先被关闭的id
+				close_id.remove((Integer)id);//该id已经被使用，移除！
 				untitled_vc.add(id);
 			}
 			TextAtrr textAtrr = new TextAtrr(false, id, "untitled" + id, null);
@@ -130,6 +128,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			hm_name_atrr.put(currentAreaName, textAtrr);
 			sequece_name.add(currentAreaName);
 			
+			jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
 			JTextArea jta = new JTextArea();
 			JButton switchbtn = new JButton(currentAreaName);
 			switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT);
@@ -161,7 +160,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			JTextArea jta = new JTextArea();
 			jp.add(jsp,BorderLayout.CENTER);
 			jsp.setViewportView(jta);
-			String lineText = null;
+			
 			TextAtrr textAtrr;
 			
 			int value = jf.showOpenDialog(null);
@@ -174,33 +173,12 @@ public class MainFrame extends JFrame implements ActionListener{
 				currentAreaName = file.getName();
 				
 				if (file.isFile() && file.exists()) {
-					try {
-						InputStreamReader isr = new InputStreamReader(
-								new FileInputStream(file),encoding);
-						BufferedReader br = new BufferedReader(isr);
-						try {
-							while((lineText = br.readLine()) != null){
-								jta.append(lineText);
-								jta.append("\n");
-							}
-							br.close();
-							isr.close();
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}catch (UnsupportedEncodingException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					war.openFrom(file, jta);//写入程序
 				}
 			}
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[2])) {//open folder
-			System.out.println(hmTextArea.get("untitled").getText());
+
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[3])) {//New view into file
 			
@@ -210,7 +188,6 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 			if (hmTextArea.size() != 0 && (!textAtrr.getisSave())) {
 				JFileChooser jf = new JFileChooser();
-				String lineTxt = null;
 				int value = jf.showSaveDialog(null);
 				if (value == JFileChooser.APPROVE_OPTION) {
 					File file = jf.getSelectedFile();
@@ -219,46 +196,37 @@ public class MainFrame extends JFrame implements ActionListener{
 					textAtrr.setFilename(file.getName());
 					textAtrr.setFileAddress(file.getPath());
 					textAtrr.setisSave(true);
-					currentButton.setText(file.getName());
+					war.saveTo(file, hmTextArea.get(currentAreaName).getText());//写入文件
+					JTextArea temp_area = hmTextArea.get(currentAreaName);
+					JButton temp_btn = hm_name_btn.get(currentAreaName);
+					TextAtrr temp_atrr = hm_name_atrr.get(currentAreaName);
 					
-					try {
-						OutputStreamWriter osw = new OutputStreamWriter(
-								new FileOutputStream(file),encoding);
-						BufferedWriter bw = new BufferedWriter(osw);
-						try {
-							bw.write(hmTextArea.get(currentAreaName).getText());
-							bw.close();
-							osw.close();
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+					hmTextArea.remove(currentAreaName);
+					hm_name_atrr.remove(currentAreaName);
+					hm_name_btn.remove(currentAreaName);
+					
+					close_id.add(textAtrr.getID());//将该文本域的ID加入缺省ID集合
+					untitled_vc.remove(currentAreaName);
+					int index = sequece_name.indexOf(currentAreaName);
+					sequece_name.remove(index);
+					
+					currentAreaName = file.getName();
+					sequece_name.insertElementAt(currentAreaName, index);
+					
+					hmTextArea.put(currentAreaName, temp_area);
+					hm_name_atrr.put(currentAreaName, temp_atrr);
+					hm_name_btn.put(currentAreaName, temp_btn);
+					
+					currentButton.setText(file.getName());
+					for(int i = 0; i < sequece_name.size();i++){
+						System.out.println(sequece_name.get(i));
 					}
 				}
-			
 			}else if (textAtrr.getisSave()) {
 				/*当文件并非第一次创建的时候，已经保存过了
 				 * 会弹出选择窗口*/
 				File file = new File(textAtrr.getFileAddress());
-				try {
-					OutputStreamWriter osw = new OutputStreamWriter(
-							new FileOutputStream(file),encoding);
-					BufferedWriter bw = new BufferedWriter(osw);
-					try {
-						bw.write(hmTextArea.get(currentAreaName).getText());
-						bw.close();
-						osw.close();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				war.saveTo(file, hmTextArea.get(currentAreaName).getText());
 			}
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[5])) {//save as
@@ -274,13 +242,12 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close file
-			fileNumber--;
 			TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 			if (!textAtrr.getisSave()) {//未保存
 				close_id.add(textAtrr.getID());
 				untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
 			}
-			//jp.remove(jsp);
+
 			jsp.remove(hmTextArea.get(currentAreaName));
 			northjp.remove(currentButton);
 
@@ -305,11 +272,23 @@ public class MainFrame extends JFrame implements ActionListener{
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//Close all file
 			jp.remove(jsp);
-			jp.remove(northjp);
+			//jp.remove(northjp);
+			northjp.removeAll();
+			clearAllEl();
 			jp.updateUI();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[11])) {//exit
 			System.exit(0);
 		}
+	}
+	//当关闭页面上所有的page，需要clear所有需要维护的变量
+	private void clearAllEl(){
+		hm_name_atrr.clear();
+		hm_name_btn.clear();
+		hmTextArea.clear();
+		
+		sequece_name.removeAllElements();
+		close_id.clear();
+		untitled_vc.clear();
 	}
 }
