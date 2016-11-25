@@ -8,7 +8,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.awt.RenderingHints.Key;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +24,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
 import com.cqu.roy.attribute.TextAtrr;
@@ -58,6 +56,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	private Vector<Integer> untitled_vc = new Vector<>();//未保存的id集合
 	private Vector<Integer> close_id = new Vector<>();//保留ID,如1234,把2关闭啦，close_id保存数字2,然后下一个new 的时候命名为2
 	private Vector<String> sequece_name = new Vector<>();//文件打开的序列;
+	
+	//JFileChooser只能有一个
+	private static int fileCount = 0;
 	
 	//组和键
 	private boolean com_shift = false;
@@ -94,12 +95,14 @@ public class MainFrame extends JFrame implements ActionListener{
 		initFileMenu();
 		initEditMenu();
 		setJMenuBar(bar);
+		
 		/*全局键盘监听*/
 		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-			
+
 			@Override
 			public void eventDispatched(AWTEvent event) {
 				// TODO Auto-generated method stub
+				//为什么按下一个键会回调两次
 				JTextArea currentArea = hmTextArea.get(currentAreaName);
 				if (((KeyEvent)event).getID() == KeyEvent.KEY_PRESSED) {
 					switch (((KeyEvent)event).getKeyCode()) {
@@ -123,8 +126,33 @@ public class MainFrame extends JFrame implements ActionListener{
 						break;
 					case KeyCode.W:
 						com_W = true;
+						break;
 					default:
 						break;
+					}
+					//file
+					//save
+					if (com_S && com_ctrl) {
+						saveOp();
+					}
+					//open
+					else if (com_O && com_ctrl) {
+						openOp();
+					}
+					//new
+					else if (com_N && com_ctrl && !com_shift) {
+						newFile();
+					}
+					else if (com_ctrl && com_W && !com_shift) {
+						closeFileOp();
+					}
+					//new window
+					else if (com_N && com_ctrl && com_shift) {
+						newWindow();
+					}
+					//close window
+					else if (com_W && com_ctrl && com_shift) {
+						closeWindow();
 					}
 				}
 				else if(((KeyEvent)event).getID() == KeyEvent.KEY_RELEASED){
@@ -153,30 +181,6 @@ public class MainFrame extends JFrame implements ActionListener{
 					default:
 						break;
 					}
-				}
-				//file
-				//save
-				if (com_S && com_ctrl) {
-					saveOp();
-				}
-				//open
-				else if (com_O && com_ctrl) {
-					openOp();
-				}
-				//new
-				else if (com_N && com_ctrl) {
-					newFile();
-				}
-				else if (com_ctrl && com_W) {
-					closeFileOp();
-				}
-				//new window
-				else if (com_N && com_ctrl && com_shift) {
-					newWindow();
-				}
-				//close window
-				else if (com_W && com_ctrl && com_shift) {
-					closeWindow();
 				}
 			}
 		}, AWTEvent.KEY_EVENT_MASK);
@@ -288,13 +292,17 @@ public class MainFrame extends JFrame implements ActionListener{
 	}
 	//save
 	private void saveOp(){
-
+		if (currentAreaName == null || fileCount != 0) {
+			return;
+		}
 		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 		
 		if (hmTextArea.size() != 0 && (!textAtrr.getisSave())) {
 			JFileChooser jf = new JFileChooser();
-			int value = jf.showSaveDialog(null);
+			fileCount++;
+			int value = jf.showSaveDialog(null);//阻塞
 			if (value == JFileChooser.APPROVE_OPTION) {
+				fileCount--;
 				File file = jf.getSelectedFile();
 				/*当打开文件是第一次被保存时候，向hashmap中添加条目
 				 * 并且会弹出窗口选择*/
@@ -318,6 +326,10 @@ public class MainFrame extends JFrame implements ActionListener{
 				
 				addMap(currentAreaName, temp_area, temp_btn, temp_atrr);
 				currentButton.setText(file.getName());
+				this.requestFocus();
+			}else {
+				fileCount--;
+				this.requestFocus();
 			}
 		}else if (textAtrr.getisSave()) {
 			/*当文件并非第一次创建的时候，已经保存过了
@@ -328,14 +340,19 @@ public class MainFrame extends JFrame implements ActionListener{
 	}
 	//open
 	private void openOp(){
+		if (fileCount != 0) {
+			return;
+		}
 		JFileChooser jf = new JFileChooser();
 		JTextArea jta = new JTextArea();
 		JButton btn = new JButton();
 		
 		TextAtrr textAtrr;
 		
-		int value = jf.showOpenDialog(null);
+		fileCount++;
+		int value = jf.showOpenDialog(null);//此操作会阻塞
 		if (value == JFileChooser.APPROVE_OPTION) {
+			fileCount--;
 			jp.updateUI();
 			File file = jf.getSelectedFile();
 			textAtrr = new TextAtrr(true, 0, file.getName(), file.getPath());
@@ -371,11 +388,18 @@ public class MainFrame extends JFrame implements ActionListener{
 				sequece_name.add(currentAreaName);
 				jp.add(jsp,BorderLayout.CENTER);
 				jsp.setViewportView(jta);
+				this.requestFocus();
 			}
+		}else{
+			fileCount--;
+			this.requestFocus();
 		}
 	}
 	//close file
 	private void closeFileOp(){
+		if (currentAreaName == null) {
+			return;
+		}
 		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 		if (!textAtrr.getisSave()) {//未保存
 			close_id.add(textAtrr.getID());
@@ -390,7 +414,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		int index = sequece_name.indexOf(currentAreaName);
 		if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
-			//do nothing
+			currentAreaName = null;
+			currentButton = null;
 		}
 		else if (index == sequece_name.size() - 1) {
 			sequece_name.remove(currentAreaName);
