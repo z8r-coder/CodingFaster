@@ -3,22 +3,17 @@
  * 放置切换当前文本域的按钮放在north*/
 package com.cqu.roy.mainframe;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.RenderingHints.Key;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -30,11 +25,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.constant.ItemName;
+import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
 
 public class MainFrame extends JFrame implements ActionListener{
@@ -62,6 +59,18 @@ public class MainFrame extends JFrame implements ActionListener{
 	private Vector<Integer> close_id = new Vector<>();//保留ID,如1234,把2关闭啦，close_id保存数字2,然后下一个new 的时候命名为2
 	private Vector<String> sequece_name = new Vector<>();//文件打开的序列;
 	
+	//组和键
+	private boolean com_shift = false;
+	private boolean com_ctrl = false;
+	//file
+	private boolean com_S = false;//save
+	private boolean com_O = false;//open
+	private boolean com_N = false;//new
+	private boolean com_W = false;//close
+	
+	private boolean com_Z = false;//undo
+	private boolean com_Y = false;//redo
+	
 	public MainFrame() {
 		// TODO Auto-generated constructor stub
 		Toolkit tool = getToolkit();
@@ -85,7 +94,92 @@ public class MainFrame extends JFrame implements ActionListener{
 		initFileMenu();
 		initEditMenu();
 		setJMenuBar(bar);
-		
+		/*全局键盘监听*/
+		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+			
+			@Override
+			public void eventDispatched(AWTEvent event) {
+				// TODO Auto-generated method stub
+				JTextArea currentArea = hmTextArea.get(currentAreaName);
+				if (((KeyEvent)event).getID() == KeyEvent.KEY_PRESSED) {
+					switch (((KeyEvent)event).getKeyCode()) {
+					case KeyCode.CTRL:	
+						if (currentArea != null) {
+							currentArea.setEditable(false);//锁住area
+						}
+						com_ctrl = true;
+						break;
+					case KeyCode.SHIFT:
+						com_shift = true;
+						break;
+					case KeyCode.S:
+						com_S = true;
+						break;
+					case KeyCode.O:
+						com_O = true;
+						break;
+					case KeyCode.N:
+						com_N = true;
+						break;
+					case KeyCode.W:
+						com_W = true;
+					default:
+						break;
+					}
+				}
+				else if(((KeyEvent)event).getID() == KeyEvent.KEY_RELEASED){
+					switch (((KeyEvent)event).getKeyCode()) {
+					case KeyCode.CTRL:
+						if (currentArea != null) {
+							currentArea.setEditable(true);//锁住area
+						}
+						com_ctrl = false;
+						break;
+					case KeyCode.SHIFT:
+						com_shift = false;
+						break;
+					case KeyCode.S:
+						com_S = false;
+						break;
+					case KeyCode.O:
+						com_O = false;
+						break;
+					case KeyCode.N:
+						com_N = false;
+						break;
+					case KeyCode.W:
+						com_W = false;
+						break;
+					default:
+						break;
+					}
+				}
+				//file
+				//save
+				if (com_S && com_ctrl) {
+					saveOp();
+				}
+				//open
+				else if (com_O && com_ctrl) {
+					openOp();
+				}
+				//new
+				else if (com_N && com_ctrl) {
+					newFile();
+				}
+				else if (com_ctrl && com_W) {
+					closeFileOp();
+				}
+				//new window
+				else if (com_N && com_ctrl && com_shift) {
+					newWindow();
+				}
+				//close window
+				else if (com_W && com_ctrl && com_shift) {
+					closeWindow();
+				}
+			}
+		}, AWTEvent.KEY_EVENT_MASK);
 		setVisible(true);
  	}
 	
@@ -134,10 +228,10 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[7])) {//new window
-			
+			newWindow();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[8])) {//Close window
-			
+			closeWindow();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close file
 			closeFileOp();
@@ -317,6 +411,14 @@ public class MainFrame extends JFrame implements ActionListener{
 		clearAllEl();
 		jp.updateUI();
 	}
+	//new a window
+	private void newWindow() {
+		new MainFrame();
+	}
+	//close current window
+	private void closeWindow(){
+		this.setVisible(false);
+	}
 	//当关闭页面上所有的page，需要clear所有需要维护的变量
 	private void clearAllEl(){
 		hm_name_atrr.clear();
@@ -326,6 +428,9 @@ public class MainFrame extends JFrame implements ActionListener{
 		sequece_name.removeAllElements();
 		close_id.clear();
 		untitled_vc.clear();
+		
+		currentAreaName = null;
+		currentButton = null;
 	}
 	
 	private void addMap(String name,JTextArea jTextArea,JButton btn,TextAtrr atrr){
