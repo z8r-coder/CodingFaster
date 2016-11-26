@@ -5,7 +5,9 @@ package com.cqu.roy.mainframe;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
@@ -24,7 +26,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.StyledEditorKit;
 
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.attribute.writeAndread;
@@ -50,7 +53,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	private writeAndread war = new writeAndread();
 	
 	//每次页面中发生变化，需要维护的变量
-	private HashMap<String,JTextArea> hmTextArea = new HashMap<>();//名字和文本域的映射
+	private HashMap<String,JTextPane> hmTextArea = new HashMap<>();//名字和文本域的映射
 	private HashMap<String, JButton> hm_name_btn = new HashMap<>();//名字和按钮的映射
 	private HashMap<String, TextAtrr> hm_name_atrr = new HashMap<>();//名字与具体对象的映射
 	private Vector<Integer> untitled_vc = new Vector<>();//未保存的id集合
@@ -92,6 +95,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
 		/*菜单*/
 		bar = new JMenuBar();
+		bar.setFont(new Font("粗体", Font.PLAIN, 5));
 		initFileMenu();
 		initEditMenu();
 		setJMenuBar(bar);
@@ -103,7 +107,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			public void eventDispatched(AWTEvent event) {
 				// TODO Auto-generated method stub
 				//为什么按下一个键会回调两次
-				JTextArea currentArea = hmTextArea.get(currentAreaName);
+				JTextPane currentArea = hmTextArea.get(currentAreaName);
 				if (((KeyEvent)event).getID() == KeyEvent.KEY_PRESSED) {
 					switch (((KeyEvent)event).getKeyCode()) {
 					case KeyCode.CTRL:	
@@ -190,6 +194,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	private void initFileMenu(){
 		
 		Filemenu = new JMenu("File");
+		Filemenu.setFont(new Font("黑体", Font.PLAIN,15));
 		for(int i = 0; i < ItemName.selectionName.length;i++){
 			JMenuItem item = new JMenuItem(ItemName.selectionName[i]);
 			item.addActionListener(this);
@@ -264,7 +269,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		hm_name_atrr.put(currentAreaName, textAtrr);
 		sequece_name.add(currentAreaName);
 
-		JTextArea jta = new JTextArea();
+		JTextPane jtp = new JTextPane();
+		textPaneStyle(jtp);
 		JButton switchbtn = new JButton(currentAreaName);
 		switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT);
 		northjp.add(switchbtn);
@@ -282,11 +288,11 @@ public class MainFrame extends JFrame implements ActionListener{
 		});
 		currentButton = switchbtn;
 		hm_name_btn.put(switchbtn.getText(), switchbtn);
-		hmTextArea.put(currentAreaName, jta);
+		hmTextArea.put(currentAreaName, jtp);
 		
 		jp.add(jsp,BorderLayout.CENTER);
-
-		jsp.setViewportView(jta);
+		
+		jsp.setViewportView(jtp);
 		jp.updateUI();
 		northjp.updateUI();
 	}
@@ -310,7 +316,7 @@ public class MainFrame extends JFrame implements ActionListener{
 				textAtrr.setFileAddress(file.getPath());
 				textAtrr.setisSave(true);
 				war.saveTo(file, hmTextArea.get(currentAreaName).getText());//写入文件
-				JTextArea temp_area = hmTextArea.get(currentAreaName);
+				JTextPane temp_area = hmTextArea.get(currentAreaName);
 				JButton temp_btn = hm_name_btn.get(currentAreaName);
 				TextAtrr temp_atrr = hm_name_atrr.get(currentAreaName);
 				
@@ -344,7 +350,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			return;
 		}
 		JFileChooser jf = new JFileChooser();
-		JTextArea jta = new JTextArea();
+		JTextPane jtp = new JTextPane();
 		JButton btn = new JButton();
 		
 		TextAtrr textAtrr;
@@ -356,11 +362,11 @@ public class MainFrame extends JFrame implements ActionListener{
 			jp.updateUI();
 			File file = jf.getSelectedFile();
 			textAtrr = new TextAtrr(true, 0, file.getName(), file.getPath());
-			JTextArea finishWritenArea;
+			JTextPane finishWritenArea;
 			if (file.isFile() && file.exists()) {
-				finishWritenArea = war.openFrom(file, jta);//写入程序,返回值为已经写入文本的area
+				finishWritenArea = war.openFrom(file, jtp);//写入程序,返回值为已经写入文本的area
 				
-				jsp.setViewportView(finishWritenArea);
+				jsp.add(finishWritenArea);
 				
 				currentAreaName = file.getName();
 				currentButton = btn;
@@ -379,7 +385,6 @@ public class MainFrame extends JFrame implements ActionListener{
 						}
 					}
 				});
-				
 				addMap(currentAreaName, finishWritenArea, btn, textAtrr);//添加属性
 				
 				btn.setText(currentAreaName);
@@ -387,7 +392,7 @@ public class MainFrame extends JFrame implements ActionListener{
 				northjp.add(currentButton);
 				sequece_name.add(currentAreaName);
 				jp.add(jsp,BorderLayout.CENTER);
-				jsp.setViewportView(jta);
+				jsp.setViewportView(jtp);
 				this.requestFocus();
 			}
 		}else{
@@ -458,8 +463,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		currentButton = null;
 	}
 	
-	private void addMap(String name,JTextArea jTextArea,JButton btn,TextAtrr atrr){
-		hmTextArea.put(name, jTextArea);
+	private void addMap(String name,JTextPane jtp,JButton btn,TextAtrr atrr){
+		hmTextArea.put(name, jtp);
 		hm_name_btn.put(name, btn);
 		hm_name_atrr.put(name, atrr);
 	}
@@ -468,5 +473,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		hmTextArea.remove(name);
 		hm_name_atrr.remove(name);
 		hm_name_btn.remove(name);
+	}
+	private void textPaneStyle(JTextPane jtp){
+		jtp.setFont(new Font("微软雅黑", Font.PLAIN, 15));
 	}
 }

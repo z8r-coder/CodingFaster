@@ -12,6 +12,9 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 
 public class writeAndread {
 	
@@ -36,16 +39,21 @@ public class writeAndread {
 		}
 	}
 	
-	public JTextArea openFrom(File file,JTextArea jta) {
+	public JTextPane openFrom(File file,JTextPane jtp) {
 		String lineText = null;
+		StyledDocument document = jtp.getStyledDocument();
 		try {
 			InputStreamReader isr = new InputStreamReader(
 					new FileInputStream(file),encoding);
 			BufferedReader br = new BufferedReader(isr);
 			try {
 				while((lineText = br.readLine()) != null){
-					jta.append(lineText);
-					jta.append("\n");
+					try {
+						document.insertString(document.getLength(), lineText + "\n", null);
+					} catch (BadLocationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				br.close();
 				isr.close();
@@ -60,6 +68,6 @@ public class writeAndread {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		return jta;
+		return jtp;
 	}
 }
