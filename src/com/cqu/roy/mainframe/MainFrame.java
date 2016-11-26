@@ -14,19 +14,26 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.sound.midi.Sequence;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
@@ -83,6 +90,21 @@ public class MainFrame extends JFrame implements ActionListener{
 	public MainFrame() {
 		// TODO Auto-generated constructor stub
 		Toolkit tool = getToolkit();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Dimension dim = tool.getScreenSize();
 		setLocation((int)(dim.getWidth() - LenthAll.WINDOW_WIDTH) / 2,
 				(int)(dim.getHeight() - LenthAll.WINDOW_HEIGHT) / 2);
@@ -91,7 +113,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		jp = (JPanel) getContentPane();
 		jp.setLayout(bLayout);
-		
+		SwingUtilities.updateComponentTreeUI(jp);
 		northjp = new JPanel();
 		northjp.setLayout(gridLayout);
 		northjp.setSize(jp.getSize().width, 40);
@@ -111,7 +133,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			@Override
 			public void eventDispatched(AWTEvent event) {
 				// TODO Auto-generated method stub
-				//为什么按下一个键会回调两次
+
 				JTextPane currentArea = hmTextArea.get(currentAreaName);
 				if (((KeyEvent)event).getID() == KeyEvent.KEY_PRESSED) {
 					switch (((KeyEvent)event).getKeyCode()) {
@@ -168,7 +190,7 @@ public class MainFrame extends JFrame implements ActionListener{
 					switch (((KeyEvent)event).getKeyCode()) {
 					case KeyCode.CTRL:
 						if (currentArea != null) {
-							currentArea.setEditable(true);//锁住area
+							currentArea.setEditable(true);//解锁area
 						}
 						com_ctrl = false;
 						break;
@@ -190,6 +212,9 @@ public class MainFrame extends JFrame implements ActionListener{
 					default:
 						break;
 					}
+				}
+				else if (((KeyEvent)event).getID() == KeyEvent.KEY_TYPED) {
+
 				}
 			}
 		}, AWTEvent.KEY_EVENT_MASK);
@@ -229,31 +254,28 @@ public class MainFrame extends JFrame implements ActionListener{
 		else if (e.getActionCommand().equals(ItemName.selectionName[2])) {//open folder
 
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[3])) {//New view into file
-			
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[4])) {//save
+		else if (e.getActionCommand().equals(ItemName.selectionName[3])) {//save
 			saveOp();
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[5])) {//save as
+		else if (e.getActionCommand().equals(ItemName.selectionName[4])) {//save as
 			
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[6])) {//save all
-			
+		else if (e.getActionCommand().equals(ItemName.selectionName[5])) {//save all
+			saveAll();
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[7])) {//new window
+		else if (e.getActionCommand().equals(ItemName.selectionName[6])) {//new window
 			newWindow();
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[8])) {//Close window
+		else if (e.getActionCommand().equals(ItemName.selectionName[7])) {//Close window
 			closeWindow();
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close file
+		else if (e.getActionCommand().equals(ItemName.selectionName[8])) {//Close file
 			closeFileOp();
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//Close all file
+		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close all file
 			closeAllFileOp();
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[11])) {//exit
+		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//exit
 			System.exit(0);
 		}
 	}
@@ -269,6 +291,12 @@ public class MainFrame extends JFrame implements ActionListener{
 			untitled_vc.add(id);
 		}
 		TextAtrr textAtrr = new TextAtrr(false, id, "untitled" + id, null);
+		//存在前一个页面，要对前一个页面解锁
+		
+		if (currentAreaName != null) {
+			hmTextArea.get(currentAreaName).setEditable(true);
+			jsp.remove(hmTextArea.get(currentAreaName));//同时移除掉，前面一个的页面
+		}
 		currentAreaName = "untitled" + id;
 		
 		hm_name_atrr.put(currentAreaName, textAtrr);
@@ -286,6 +314,7 @@ public class MainFrame extends JFrame implements ActionListener{
 					jsp.remove(hmTextArea.get(currentAreaName));
 					currentAreaName = switchbtn.getText();
 					currentButton = switchbtn;
+					jsp.add(hmTextArea.get(currentAreaName));
 					jsp.setViewportView(hmTextArea.get(currentAreaName));
 					jsp.updateUI();
 				}
@@ -348,6 +377,63 @@ public class MainFrame extends JFrame implements ActionListener{
 			 * 会弹出选择窗口*/
 			File file = new File(textAtrr.getFileAddress());
 			war.saveTo(file, hmTextArea.get(currentAreaName).getText());
+		}
+	}
+	//save all
+	private void saveAll(){
+//		JOptionPane.showConfirmDialog(jsp, "你确认要保存吗？", "确认窗口"
+//				, JOptionPane.YES_NO_OPTION);
+		
+		Vector<String> image_sequece = new Vector<>();
+		image_sequece = (Vector<String>) sequece_name.clone();
+
+		for(String fileName:image_sequece){
+			TextAtrr textAtrr = hm_name_atrr.get(fileName);
+			if (!textAtrr.getisSave()) {
+				JFileChooser jf = new JFileChooser();
+				fileCount++;
+				int value = jf.showSaveDialog(null);//阻塞
+				if (value == JFileChooser.APPROVE_OPTION) {
+					fileCount--;
+					File file = jf.getSelectedFile();
+					/*当打开文件是第一次被保存时候，向hashmap中添加条目
+					 * 并且会弹出窗口选择*/
+					textAtrr.setFilename(file.getName());
+					textAtrr.setFileAddress(file.getPath());
+					textAtrr.setisSave(true);
+					
+					war.saveTo(file, hmTextArea.get(fileName).getText());//写入文件
+					
+					JTextPane temp_area = hmTextArea.get(fileName);
+					JButton temp_btn = hm_name_btn.get(fileName);
+					TextAtrr temp_atrr = hm_name_atrr.get(fileName);
+					
+					removeMap(fileName);
+					
+					close_id.add(textAtrr.getID());//将该文本域的ID加入缺省ID集合
+					untitled_vc.remove(fileName);
+					int index = sequece_name.indexOf(fileName);
+					sequece_name.remove(index);
+					
+					String newName = file.getName();
+					sequece_name.insertElementAt(newName, index);
+					
+					addMap(newName, temp_area, temp_btn, temp_atrr);
+					temp_btn.setText(file.getName());
+					this.requestFocus();
+					if (currentAreaName == fileName) {
+						currentAreaName = newName;
+					}
+				}else {
+					fileCount--;
+					this.requestFocus();
+				}
+			}else {
+				/*当文件并非第一次创建的时候，已经保存过了
+				 * 会弹出选择窗口*/
+				File file = new File(textAtrr.getFileAddress());
+				war.saveTo(file, hmTextArea.get(fileName).getText());
+			}
 		}
 	}
 	//open
@@ -420,13 +506,14 @@ public class MainFrame extends JFrame implements ActionListener{
 		jsp.remove(hmTextArea.get(currentAreaName));
 		northjp.remove(currentButton);
 
-		hm_name_atrr.remove(currentAreaName);
-		hmTextArea.remove(currentAreaName);
+		removeMap(currentAreaName);//维护表变量
 		
 		int index = sequece_name.indexOf(currentAreaName);
 		if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
+			sequece_name.remove(currentAreaName);
 			currentAreaName = null;
 			currentButton = null;
+			jp.remove(jsp);
 		}
 		else if (index == sequece_name.size() - 1) {
 			sequece_name.remove(currentAreaName);
@@ -437,7 +524,9 @@ public class MainFrame extends JFrame implements ActionListener{
 			currentAreaName = sequece_name.get(index);
 			currentButton = hm_name_btn.get(currentAreaName);
 		}
-		jsp.setViewportView(hmTextArea.get(currentAreaName));
+		if (currentAreaName != null) {
+			jsp.setViewportView(hmTextArea.get(currentAreaName));
+		}
 		jp.updateUI();
 	}
 	//close all file 

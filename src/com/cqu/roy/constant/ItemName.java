@@ -5,7 +5,6 @@ public interface ItemName {
 			"New File                                " + "Ctrl+N" + "   ",
 			"Open File                              " + "Ctrl+O" + "   ",
 			"Open Folder",
-			"New View into File",
 			"Save                                      " + "Ctrl+S",
 			"Save as                                " + "Ctrl+Shift+S",
 			"Save All",
