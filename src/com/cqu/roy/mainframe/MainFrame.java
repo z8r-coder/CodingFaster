@@ -27,6 +27,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.text.Style;
+import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
 
 import com.cqu.roy.attribute.TextAtrr;
@@ -34,6 +36,7 @@ import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
+import com.cuq.roy.mywdiget.MyFontStyle;
 
 public class MainFrame extends JFrame implements ActionListener{
 	private JPanel jp;
@@ -46,6 +49,8 @@ public class MainFrame extends JFrame implements ActionListener{
 	private GridLayout gridLayout = new GridLayout(1, 6);
 	
 	private JPanel northjp;
+	
+	private MyFontStyle myFontStyle;//字体样式
 	
 	private String currentAreaName = null;//当前聚焦的文本
 	private JButton currentButton = null;//当前聚焦的文本按钮
@@ -246,7 +251,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			closeFileOp();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//Close all file
-			clossAllFileOp();
+			closeAllFileOp();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[11])) {//exit
 			System.exit(0);
@@ -270,7 +275,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		sequece_name.add(currentAreaName);
 
 		JTextPane jtp = new JTextPane();
-		textPaneStyle(jtp);
+		textPaneStyle(jtp,"Style06");
 		JButton switchbtn = new JButton(currentAreaName);
 		switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT);
 		northjp.add(switchbtn);
@@ -290,9 +295,10 @@ public class MainFrame extends JFrame implements ActionListener{
 		hm_name_btn.put(switchbtn.getText(), switchbtn);
 		hmTextArea.put(currentAreaName, jtp);
 		
+		jsp.add(jtp);
+		jsp.setViewportView(jtp);
 		jp.add(jsp,BorderLayout.CENTER);
 		
-		jsp.setViewportView(jtp);
 		jp.updateUI();
 		northjp.updateUI();
 	}
@@ -364,8 +370,8 @@ public class MainFrame extends JFrame implements ActionListener{
 			textAtrr = new TextAtrr(true, 0, file.getName(), file.getPath());
 			JTextPane finishWritenArea;
 			if (file.isFile() && file.exists()) {
-				finishWritenArea = war.openFrom(file, jtp);//写入程序,返回值为已经写入文本的area
 				
+				finishWritenArea = war.openFrom(file, jtp);//写入程序,返回值为已经写入文本的pane
 				jsp.add(finishWritenArea);
 				
 				currentAreaName = file.getName();
@@ -435,7 +441,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		jp.updateUI();
 	}
 	//close all file 
-	private void clossAllFileOp(){
+	private void closeAllFileOp(){
 		jp.remove(jsp);
 		northjp.removeAll();
 		clearAllEl();
@@ -474,7 +480,11 @@ public class MainFrame extends JFrame implements ActionListener{
 		hm_name_atrr.remove(name);
 		hm_name_btn.remove(name);
 	}
-	private void textPaneStyle(JTextPane jtp){
-		jtp.setFont(new Font("微软雅黑", Font.PLAIN, 15));
+	private void textPaneStyle(JTextPane jtp,String StyleName){
+		StyledDocument styledDocument = jtp.getStyledDocument();
+		MyFontStyle myFontStyle = new MyFontStyle(styledDocument);
+		styledDocument = myFontStyle.getStyleDoc();
+		styledDocument.setLogicalStyle(3, styledDocument.getStyle(StyleName));
+		jtp.setStyledDocument(styledDocument);
 	}
 }

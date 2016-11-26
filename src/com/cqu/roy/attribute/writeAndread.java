@@ -16,6 +16,8 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
+import com.cuq.roy.mywdiget.MyFontStyle;
+
 public class writeAndread {
 	
 	private final static String encoding = "UTF-8";
@@ -42,6 +44,9 @@ public class writeAndread {
 	public JTextPane openFrom(File file,JTextPane jtp) {
 		String lineText = null;
 		StyledDocument document = jtp.getStyledDocument();
+		MyFontStyle myFontStyle = new MyFontStyle(document);
+		document = myFontStyle.getStyleDoc();
+		jtp.setStyledDocument(document);
 		try {
 			InputStreamReader isr = new InputStreamReader(
 					new FileInputStream(file),encoding);
@@ -49,7 +54,9 @@ public class writeAndread {
 			try {
 				while((lineText = br.readLine()) != null){
 					try {
-						document.insertString(document.getLength(), lineText + "\n", null);
+						
+						document.insertString(document.getLength(), lineText + "\n"
+								, document.getStyle("Style06"));
 					} catch (BadLocationException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
