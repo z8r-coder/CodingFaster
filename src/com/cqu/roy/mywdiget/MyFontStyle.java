@@ -1,4 +1,4 @@
-package com.cuq.roy.mywdiget;
+package com.cqu.roy.mywdiget;
 
 import java.awt.Color;
 import java.awt.Font;

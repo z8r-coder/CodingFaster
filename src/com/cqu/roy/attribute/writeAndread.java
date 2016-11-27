@@ -16,7 +16,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
-import com.cuq.roy.mywdiget.MyFontStyle;
+import com.cqu.roy.mywdiget.MyFontStyle;
 
 public class writeAndread {
 	

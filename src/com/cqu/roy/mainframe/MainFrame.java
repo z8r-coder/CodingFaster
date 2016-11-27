@@ -43,7 +43,7 @@ import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
-import com.cuq.roy.mywdiget.MyFontStyle;
+import com.cqu.roy.mywdiget.MyFontStyle;
 
 public class MainFrame extends JFrame implements ActionListener{
 	private JPanel jp;
@@ -501,6 +501,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		if (!textAtrr.getisSave()) {//未保存
 			close_id.add(textAtrr.getID());
 			untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
+			
 		}
 
 		jsp.remove(hmTextArea.get(currentAreaName));
