@@ -19,8 +19,10 @@ public class SaveDialog{
 	public static int showOptionDialog(Component parentComponent, Object message, 
 			String title, int optionType, int messageType, Icon icon, Object[] options,
 			Object initialValue,int width,int height){
+		
 		JOptionPane pane = new JOptionPane(message, messageType, optionType,
 				icon, options, initialValue);
+		
 		JDialog myDialog = pane.createDialog(title);
 		myDialog.setSize(width, height);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

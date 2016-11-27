@@ -5,9 +5,11 @@ package com.cqu.roy.mainframe;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
@@ -18,11 +20,15 @@ import java.awt.font.TextAttribute;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.function.Function;
 
 import javax.sound.midi.Sequence;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -40,10 +46,12 @@ import javax.swing.text.StyledEditorKit;
 
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.attribute.writeAndread;
+import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
 import com.cqu.roy.mywdiget.MyFontStyle;
+import com.cqu.roy.mywdiget.SaveDialog;
 
 public class MainFrame extends JFrame implements ActionListener{
 	private JPanel jp;
@@ -54,6 +62,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	private BorderLayout bLayout = new BorderLayout();
 	private GridLayout gridLayout = new GridLayout(1, 6);
+	
+	String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
+			.getAvailableFontFamilyNames();
 	
 	private JPanel northjp;
 	
@@ -74,6 +85,8 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	//JFileChooser只能有一个
 	private static int fileCount = 0;
+	//在closeFile中获取JFileChooser是按的确定还是取消
+	private static int sureOrcancel;
 	
 	//组和键
 	private boolean com_shift = false;
@@ -87,6 +100,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	private boolean com_Z = false;//undo
 	private boolean com_Y = false;//redo
 	
+	//dialog 选项与图片
+	Icon icon = new ImageIcon("src/imageResources/warning.png");
+	Object[] selection = {"Save","Cancle","Close Without Saving"};
 	public MainFrame() {
 		// TODO Auto-generated constructor stub
 		Toolkit tool = getToolkit();
@@ -175,7 +191,7 @@ public class MainFrame extends JFrame implements ActionListener{
 						newFile();
 					}
 					else if (com_ctrl && com_W && !com_shift) {
-						closeFileOp();
+						closeFileOp(null);
 					}
 					//new window
 					else if (com_N && com_ctrl && com_shift) {
@@ -270,7 +286,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			closeWindow();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[8])) {//Close file
-			closeFileOp();
+			closeFileOp(null);
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close all file
 			closeAllFileOp();
@@ -344,6 +360,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			int value = jf.showSaveDialog(null);//阻塞
 			if (value == JFileChooser.APPROVE_OPTION) {
 				fileCount--;
+				sureOrcancel = ButtonMsg.SURE;
 				File file = jf.getSelectedFile();
 				/*当打开文件是第一次被保存时候，向hashmap中添加条目
 				 * 并且会弹出窗口选择*/
@@ -370,6 +387,7 @@ public class MainFrame extends JFrame implements ActionListener{
 				this.requestFocus();
 			}else {
 				fileCount--;
+				sureOrcancel = ButtonMsg.CANCLE;
 				this.requestFocus();
 			}
 		}else if (textAtrr.getisSave()) {
@@ -493,7 +511,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		}
 	}
 	//close file
-	private void closeFileOp(){
+	private void closeFileOp(String fn){
 		if (currentAreaName == null) {
 			return;
 		}
@@ -501,7 +519,55 @@ public class MainFrame extends JFrame implements ActionListener{
 		if (!textAtrr.getisSave()) {//未保存
 			close_id.add(textAtrr.getID());
 			untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
+			/*询问用户是否保存该修改的页面*/
+			//此处为了给closeAllfile 复用
+//			String newFileName;
+//			if (fn != null) {
+//				newFileName = fn;
+//			}else{
+//				newFileName = "New file";
+//			}
+			JLabel fontSet = new JLabel("Save changes to " + currentAreaName 
+					+" before closing?");
+			fontSet.setFont(new Font(fontNames[16], Font.BOLD, 15));
+			int selectionValue = SaveDialog.showOptionDialog(this, fontSet, "warning"
+					, JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE, icon, selection
+					, selection[0], LenthAll.DIALOG_WIDTH, LenthAll.DIALOG_HEIGHT);
 			
+			switch (selectionValue) {
+			case 0://save
+				saveOp();
+				if (sureOrcancel == ButtonMsg.CANCLE) {
+					return;
+				}
+				break;
+			case 1://cancel
+				return;
+			case 2://close without saving
+				break;
+			default:
+				break;
+			}
+		}else{//已经保存
+			JLabel fontSet = new JLabel("Save changes to " + currentAreaName 
+					+" before closing?");
+			fontSet.setFont(new Font(fontNames[16], Font.BOLD, 15));
+			int selectionValue = SaveDialog.showOptionDialog(this, fontSet, "warning"
+					, JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE, icon, selection
+					, selection[0], 500, 200);
+			switch (selectionValue) {
+			case 0://save
+				saveOp();
+				break;
+			case 1://cancel
+				return;
+			case 2://close without saving
+				break;
+			default:
+				break;
+			}
 		}
 
 		jsp.remove(hmTextArea.get(currentAreaName));
@@ -532,10 +598,12 @@ public class MainFrame extends JFrame implements ActionListener{
 	}
 	//close all file 
 	private void closeAllFileOp(){
-		jp.remove(jsp);
-		northjp.removeAll();
-		clearAllEl();
-		jp.updateUI();
+		Vector<String> seq_clone = (Vector<String>) sequece_name.clone();
+		for(String s:seq_clone){
+			currentAreaName = s;
+			currentButton = hm_name_btn.get(s);
+			closeFileOp(s);
+		}
 	}
 	//new a window
 	private void newWindow() {
