@@ -182,7 +182,7 @@ public class MainFrame extends JFrame implements ActionListener{
 					//file
 					//save
 					if (com_S && com_ctrl) {
-						saveOp();
+						saveSingleOp();
 					}
 					//open
 					else if (com_O && com_ctrl) {
@@ -273,7 +273,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[3])) {//save
-			saveOp();
+			saveSingleOp();
 		}
 		else if (e.getActionCommand().equals(ItemName.selectionName[4])) {//save as
 			
@@ -351,45 +351,18 @@ public class MainFrame extends JFrame implements ActionListener{
 		northjp.updateUI();
 	}
 	//save
-	private void saveOp(){
+	private void saveSingleOp(){
 		if (currentAreaName == null || fileCount != 0) {
 			return;
 		}
 		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 		
-		if (hmTextArea.size() != 0 && (!textAtrr.getisSave())) {
+		if (!textAtrr.getisSave()) {
 			JFileChooser jf = new JFileChooser();
 			fileCount++;
 			int value = jf.showSaveDialog(null);//阻塞
 			if (value == JFileChooser.APPROVE_OPTION) {
-				fileCount--;
-				sureOrcancel = ButtonMsg.SURE;
-				File file = jf.getSelectedFile();
-				/*当打开文件是第一次被保存时候，向hashmap中添加条目
-				 * 并且会弹出窗口选择*/
-				textAtrr.setFilename(file.getName());
-				textAtrr.setFileAddress(file.getPath());
-				textAtrr.setisSave(true);
-				war.saveTo(file, hmTextArea.get(currentAreaName).getText());//写入文件
-				JTextPane temp_area = hmTextArea.get(currentAreaName);
-				JpathButton temp_btn = hm_name_btn.get(currentAreaName);
-				
-				TextAtrr temp_atrr = hm_name_atrr.get(currentAreaName);
-				
-				removeMap(currentAreaName);
-				
-				close_id.add(textAtrr.getID());//将该文本域的ID加入缺省ID集合
-				untitled_vc.remove(currentAreaName);
-				int index = sequece_name.indexOf(currentAreaName);
-				sequece_name.remove(index);
-				
-				currentAreaName = file.getPath();
-				temp_btn.setMapFilePath(currentAreaName);
-				sequece_name.insertElementAt(currentAreaName, index);
-				
-				addMap(currentAreaName, temp_area, temp_btn, temp_atrr);
-				currentButton.setText(textAtrr.getFilename());
-				this.requestFocus();
+				currentAreaName = saveAssistant(jf, textAtrr, currentAreaName);
 			}else {
 				fileCount--;
 				sureOrcancel = ButtonMsg.CANCLE;
@@ -473,34 +446,7 @@ public class MainFrame extends JFrame implements ActionListener{
 				fileCount++;
 				int value = jf.showSaveDialog(null);//阻塞
 				if (value == JFileChooser.APPROVE_OPTION) {
-					fileCount--;
-					File file = jf.getSelectedFile();
-					/*当打开文件是第一次被保存时候，向hashmap中添加条目
-					 * 并且会弹出窗口选择*/
-					textAtrr.setFilename(file.getName());
-					textAtrr.setFileAddress(file.getPath());
-					textAtrr.setisSave(true);
-					
-					war.saveTo(file, hmTextArea.get(fileName).getText());//写入文件
-					
-					JTextPane temp_area = hmTextArea.get(fileName);
-					JpathButton temp_btn = hm_name_btn.get(fileName);
-					TextAtrr temp_atrr = hm_name_atrr.get(fileName);
-					
-					removeMap(fileName);
-					
-					close_id.add(textAtrr.getID());//将该文本域的ID加入缺省ID集合
-					untitled_vc.remove(fileName);
-					int index = sequece_name.indexOf(fileName);
-					sequece_name.remove(index);
-					
-					String newName = file.getPath();
-					sequece_name.insertElementAt(newName, index);
-					
-					temp_btn.setMapFilePath(newName);
-					addMap(newName, temp_area, temp_btn, temp_atrr);
-					temp_btn.setText(file.getName());
-					this.requestFocus();
+					String newName = saveAssistant(jf, textAtrr, fileName);
 					if (currentAreaName == fileName) {
 						currentAreaName = newName;
 					}
@@ -540,7 +486,7 @@ public class MainFrame extends JFrame implements ActionListener{
 				finishWritenArea = war.openFrom(file, jtp);//写入程序,返回值为已经写入文本的pane
 				jsp.add(finishWritenArea);
 				
-				currentAreaName = file.getName();
+				currentAreaName = file.getPath();
 				btn = new JpathButton(file.getName(),file.getPath());
 				currentButton = btn;
 				
@@ -580,8 +526,6 @@ public class MainFrame extends JFrame implements ActionListener{
 		}
 		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 		if (!textAtrr.getisSave()) {//未保存
-			close_id.add(textAtrr.getID());
-			untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
 			/*询问用户是否保存该修改的页面*/
 			//此处为了给closeAllfile 复用
 //			String newFileName;
@@ -600,7 +544,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 			switch (selectionValue) {
 			case 0://save
-				saveOp();
+				saveSingleOp();
 				if (sureOrcancel == ButtonMsg.CANCLE) {
 					return;
 				}
@@ -608,6 +552,8 @@ public class MainFrame extends JFrame implements ActionListener{
 			case 1://cancel
 				return;
 			case 2://close without saving
+				close_id.add(textAtrr.getID());
+				untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
 				break;
 			default:
 				break;
@@ -622,7 +568,7 @@ public class MainFrame extends JFrame implements ActionListener{
 					, selection[0], 500, 200);
 			switch (selectionValue) {
 			case 0://save
-				saveOp();
+				saveSingleOp();
 				break;
 			case 1://cancel
 				return;
@@ -707,5 +653,38 @@ public class MainFrame extends JFrame implements ActionListener{
 		styledDocument = myFontStyle.getStyleDoc();
 		styledDocument.setLogicalStyle(3, styledDocument.getStyle(StyleName));
 		jtp.setStyledDocument(styledDocument);
+	}
+	//save辅助方法，提高代码复用率,参数1.文件选择起，2.文本属性,3,文件路径（让路径作为全局唯一Key）,return 修改后的文件路径
+	private String saveAssistant(JFileChooser jf,TextAtrr textAtrr,String fileName){
+		fileCount--;
+		sureOrcancel = ButtonMsg.SURE;//表示文件选择框是选择的确定按钮。
+		File file = jf.getSelectedFile();
+		/*当打开文件是第一次被保存时候，向hashmap中添加条目
+		 * 并且会弹出窗口选择*/
+		textAtrr.setFilename(file.getName());
+		textAtrr.setFileAddress(file.getPath());
+		textAtrr.setisSave(true);
+		
+		war.saveTo(file, hmTextArea.get(fileName).getText());//写入文件
+		
+		JTextPane temp_area = hmTextArea.get(fileName);
+		JpathButton temp_btn = hm_name_btn.get(fileName);
+		TextAtrr temp_atrr = hm_name_atrr.get(fileName);
+		
+		removeMap(fileName);
+		
+		close_id.add(textAtrr.getID());//将该文本域的ID加入缺省ID集合
+		untitled_vc.remove(fileName);
+		int index = sequece_name.indexOf(fileName);
+		sequece_name.remove(index);
+		
+		String newName = file.getPath();
+		sequece_name.insertElementAt(newName, index);
+		
+		temp_btn.setMapFilePath(newName);
+		addMap(newName, temp_area, temp_btn, temp_atrr);
+		temp_btn.setText(file.getName());
+		this.requestFocus();
+		return newName;
 	}
 }

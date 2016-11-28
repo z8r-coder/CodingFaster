@@ -52,9 +52,11 @@ public class writeAndread {
 					new FileInputStream(file),encoding);
 			BufferedReader br = new BufferedReader(isr);
 			try {
+				if (document.getLength() == 0) {
+					document.setLogicalStyle(0, document.getStyle("Style06"));
+				}
 				while((lineText = br.readLine()) != null){
 					try {
-						
 						document.insertString(document.getLength(), lineText + "\n"
 								, document.getStyle("Style06"));
 					} catch (BadLocationException e) {
