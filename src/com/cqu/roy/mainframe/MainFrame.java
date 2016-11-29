@@ -50,11 +50,13 @@ import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
+import com.cqu.roy.fileOperation.CloseAllFile;
 import com.cqu.roy.fileOperation.CloseFile;
 import com.cqu.roy.fileOperation.CloseWindow;
 import com.cqu.roy.fileOperation.FileOperation;
 import com.cqu.roy.fileOperation.OpenFile;
 import com.cqu.roy.fileOperation.SaveAll;
+import com.cqu.roy.fileOperation.SaveAs;
 import com.cqu.roy.fileOperation.SaveSingleOp;
 import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.mywdiget.JpathButton;
@@ -115,7 +117,6 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	//Table driven
 	HashMap<String, FileOperation> map = new HashMap<>();
-	private FileOperation put;
 	//单例化
 	private static MainFrame mFrame = new MainFrame();
 	private MainFrame() {
@@ -141,6 +142,9 @@ public class MainFrame extends JFrame implements ActionListener{
 				(int)(dim.getHeight() - LenthAll.WINDOW_HEIGHT) / 2);
 		setSize(LenthAll.WINDOW_WIDTH, LenthAll.WINDOW_HEIGHT);
 		setTitle("CodingFaster");
+
+		//初始化hash表
+		TableDriven();
 		
 		jp = (JPanel) getContentPane();
 		jp.setLayout(bLayout);
@@ -160,11 +164,11 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		/*全局键盘监听*/
 		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-
+			
 			@Override
 			public void eventDispatched(AWTEvent event) {
 				// TODO Auto-generated method stub
-
+				TableDriven();
 				JTextPane currentArea = hmTextArea.get(currentAreaName);
 				if (((KeyEvent)event).getID() == KeyEvent.KEY_PRESSED) {
 					switch (((KeyEvent)event).getKeyCode()) {
@@ -194,27 +198,43 @@ public class MainFrame extends JFrame implements ActionListener{
 					}
 					//file
 					//save
-					if (com_S && com_ctrl) {
-						saveSingleOp();
+					if (com_S && com_ctrl && !com_shift) {
+						//saveSingleOp();
+						map.get(ItemName.selectionName[2]).use(jp, jsp, northjp, close_id, untitled_vc
+								, sequece_name, currentAreaName, currentButton
+								, hmTextArea, hm_name_atrr, hm_name_btn);
 					}
 					//open
 					else if (com_O && com_ctrl) {
-						openOp();
+						//openOp();
+						map.get(ItemName.selectionName[1]).use(jp, jsp, northjp, close_id, untitled_vc
+								, sequece_name, currentAreaName, currentButton
+								, hmTextArea, hm_name_atrr, hm_name_btn);
 					}
 					//new
 					else if (com_N && com_ctrl && !com_shift) {
-						newFile();
+						//newFile();
+						map.get(ItemName.selectionName[0]).use(jp, jsp, northjp, close_id, untitled_vc
+								, sequece_name, currentAreaName, currentButton
+								, hmTextArea, hm_name_atrr, hm_name_btn);
 					}
 					else if (com_ctrl && com_W && !com_shift) {
-						closeFileOp();
-					}
-					//new window
-					else if (com_N && com_ctrl && com_shift) {
-
+						//closeFileOp();
+						map.get(ItemName.selectionName[6]).use(jp, jsp, northjp, close_id, untitled_vc
+								, sequece_name, currentAreaName, currentButton
+								, hmTextArea, hm_name_atrr, hm_name_btn);
 					}
 					//close window
 					else if (com_W && com_ctrl && com_shift) {
-						closeWindow();
+						map.get(ItemName.selectionName[5]).use(jp, jsp, northjp, close_id, untitled_vc
+								, sequece_name, currentAreaName, currentButton
+								, hmTextArea, hm_name_atrr, hm_name_btn);
+					}
+					//save as
+					else if (com_ctrl && com_shift && com_S) {
+						map.get(ItemName.selectionName[3]).use(jp, jsp, northjp, close_id, untitled_vc
+								, sequece_name, currentAreaName, currentButton
+								, hmTextArea, hm_name_atrr, hm_name_btn);
 					}
 				}
 				else if(((KeyEvent)event).getID() == KeyEvent.KEY_RELEASED){
@@ -294,39 +314,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-//		if (e.getActionCommand().equals(ItemName.selectionName[0])) {// new file
-//			newFile();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[1])) {//open file
-//			openOp();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[2])) {//open folder
-//
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[3])) {//save
-//			saveSingleOp();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[4])) {//save as
-//			
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[5])) {//save all
-//			saveAll();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[6])) {//new window
-//			newWindow();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[7])) {//Close window
-//			closeWindow();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[8])) {//Close file
-//			closeFileOp();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close all file
-//			closeAllFileOp();
-//		}
-//		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//exit
-//			System.exit(0);
-//		}
+		//初始化hash表
 		TableDriven();
 		map.get(e.getActionCommand()).use(jp, jsp, northjp, close_id, untitled_vc
 				, sequece_name, currentAreaName
@@ -722,8 +710,10 @@ public class MainFrame extends JFrame implements ActionListener{
 		map.put(ItemName.selectionName[0], new newFile());
 		map.put(ItemName.selectionName[1], new OpenFile());
 		map.put(ItemName.selectionName[2], new SaveSingleOp());
+		map.put(ItemName.selectionName[3], new SaveAs());
 		map.put(ItemName.selectionName[4], new SaveAll());
 		map.put(ItemName.selectionName[5], new CloseWindow());
 		map.put(ItemName.selectionName[6], new CloseFile());
+		map.put(ItemName.selectionName[7], new CloseAllFile());
 	}
 }

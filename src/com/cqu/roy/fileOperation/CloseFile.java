@@ -38,6 +38,7 @@ public class CloseFile implements FileOperation{
 			HashMap<String, JTextPane> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
 			HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
+		System.out.println(sequece_name.size());
 		if (currentAreaName == null) {
 			return;
 		}
@@ -68,7 +69,7 @@ public class CloseFile implements FileOperation{
 				return;
 			case 2://close without saving
 				close_id.add(textAtrr.getID());
-				untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
+				untitled_vc.remove((Integer)(hm_name_atrr.get(mainFrame.getCurrentAreaName()).getID()));
 				break;
 			default:
 				break;
@@ -95,28 +96,30 @@ public class CloseFile implements FileOperation{
 			}
 		}
 
-		jsp.remove(hmTextArea.get(mainFrame.getCurrentAreaName()));
-		northjp.remove(mainFrame.getCurrentButton());
+		jsp.remove(hmTextArea.get(currentAreaName));
+		northjp.remove(currentButton);
 
 		removeMap(mainFrame.getCurrentAreaName());//维护表变量
 		
 		int index = sequece_name.indexOf(mainFrame.getCurrentAreaName());
 		if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
-			sequece_name.remove(mainFrame.getCurrentAreaName());
+			sequece_name.remove(currentAreaName);
 			mainFrame.setCurrentAreaName(null);//并将当前页面和按钮置为空
 			mainFrame.setCurrentButton(null);
 			jp.remove(jsp);
 		}
+		//如过是最后一页，则显示前面一页
 		else if (index == sequece_name.size() - 1) {
-			sequece_name.remove(mainFrame.getCurrentAreaName());
+			sequece_name.remove(currentAreaName);
 			mainFrame.setCurrentAreaName(sequece_name.get(sequece_name.size() - 1));
 			mainFrame.setCurrentButton(hm_name_btn.get(mainFrame.getCurrentAreaName()));
+		//如果在中间，则显示下一页
 		}else {
-			sequece_name.remove(mainFrame.getCurrentAreaName());
+			sequece_name.remove(currentAreaName);
 			mainFrame.setCurrentAreaName(sequece_name.get(index));
 			mainFrame.setCurrentButton(hm_name_btn.get(mainFrame.getCurrentAreaName()));
 		}
-		if (currentAreaName != null) {
+		if (mainFrame.getCurrentAreaName() != null) {
 			jsp.setViewportView(hmTextArea.get(mainFrame.getCurrentAreaName()));
 		}
 		jp.updateUI();

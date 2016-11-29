@@ -10,6 +10,5 @@ public interface ItemName {
 			"Close Window                     " + "Ctrl+Shift+W",
 			"Close File                              " + "Ctrl+W",
 			"Close All files",
-			"exit"
 	};
 }
