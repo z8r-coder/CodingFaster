@@ -19,8 +19,9 @@ import com.cqu.roy.mywdiget.MyFontStyle;
 
 //newFile
 public class newFile implements FileOperation{
+	MainFrame mainFrame = MainFrame.getInstance();
 	@Override
-	public JpathButton use(JPanel jp,JScrollPane jsp,JPanel northjp,Vector<Integer> close_id,Vector<Integer> untitled_vc
+	public void use(JPanel jp,JScrollPane jsp,JPanel northjp,Vector<Integer> close_id,Vector<Integer> untitled_vc
 			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, JTextPane> hmTextArea 
 			,HashMap<String, TextAtrr> hm_name_atrr,HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
@@ -41,6 +42,7 @@ public class newFile implements FileOperation{
 			jsp.remove(hmTextArea.get(currentAreaName));//同时移除掉，前面一个的页面
 		}
 		currentAreaName = "untitled" + id;
+		mainFrame.setCurrentAreaName(currentAreaName);//修改当前文件路径
 		
 		hm_name_atrr.put(currentAreaName, textAtrr);
 		sequece_name.add(currentAreaName);
@@ -51,11 +53,26 @@ public class newFile implements FileOperation{
 		
 		switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT);
 		northjp.add(switchbtn);
-		currentButton = switchbtn;
-
-
+		
+		mainFrame.setCurrentButton(switchbtn);//修改当前按钮
+		
 		hm_name_btn.put(switchbtn.getText(), switchbtn);
 		hmTextArea.put(currentAreaName, jtp);
+		mainFrame.getCurrentButton().addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				if (mainFrame.getCurrentAreaName() != switchbtn.getMapFilePath()) {
+					jsp.remove(hmTextArea.get(mainFrame.getCurrentAreaName()));
+					mainFrame.setCurrentAreaName(switchbtn.getMapFilePath());
+					mainFrame.setCurrentButton(switchbtn);
+					jsp.add(hmTextArea.get(mainFrame.getCurrentAreaName()));
+					jsp.setViewportView(hmTextArea.get(mainFrame.getCurrentAreaName()));
+					jsp.updateUI();
+				}
+			}
+		});
 		
 		jsp.add(jtp);
 		jsp.setViewportView(jtp);
@@ -63,7 +80,6 @@ public class newFile implements FileOperation{
 		
 		jp.updateUI();
 		northjp.updateUI();
-		return switchbtn;
 	}
 	private void textPaneStyle(JTextPane jtp,String StyleName){
 		StyledDocument styledDocument = jtp.getStyledDocument();

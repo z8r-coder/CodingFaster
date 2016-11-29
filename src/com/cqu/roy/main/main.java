@@ -13,7 +13,7 @@ public class main {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		MainFrame mf = new MainFrame();
+		MainFrame.getInstance();
 		//SaveDialog sDialog = new SaveDialog(mf, true, 500, 200);
 //		Icon icon = new ImageIcon("src/imageResources/warning.png");
 //		Object[] selection = {"save","cancle","  close without save  "};

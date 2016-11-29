@@ -50,7 +50,9 @@ import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
+import com.cqu.roy.fileOperation.CloseFile;
 import com.cqu.roy.fileOperation.FileOperation;
+import com.cqu.roy.fileOperation.OpenFile;
 import com.cqu.roy.fileOperation.SaveSingleOp;
 import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.mywdiget.JpathButton;
@@ -112,7 +114,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	//Table driven
 	HashMap<String, FileOperation> map = new HashMap<>();
 	private FileOperation put;
-	public MainFrame() {
+	//单例化
+	private static MainFrame mFrame = new MainFrame();
+	private MainFrame() {
 		// TODO Auto-generated constructor stub
 		Toolkit tool = getToolkit();
 		try {
@@ -246,13 +250,23 @@ public class MainFrame extends JFrame implements ActionListener{
 		setVisible(true);
 	}
 	//该构造函数专门为其他类提供当前文件路径和当前按钮
-	
+	//获取单例的对象
+	public static MainFrame getInstance() {
+		return mFrame;
+	}
 	public String getCurrentAreaName() {
 		return currentAreaName;
 	}
 	
 	public JpathButton getCurrentButton() {
 		return currentButton;
+	}
+	public void setCurrentAreaName(String currentAreaName){
+		this.currentAreaName = currentAreaName;
+	}
+	
+	public void setCurrentButton(JpathButton currentButton) {
+		this.currentButton = currentButton;
 	}
 	private void initFileMenu(){
 		
@@ -312,30 +326,9 @@ public class MainFrame extends JFrame implements ActionListener{
 //			System.exit(0);
 //		}
 		TableDriven();
-		System.out.println(e.getActionCommand());
-		JpathButton tmp = map.get(e.getActionCommand()).use(jp, jsp, northjp, close_id, untitled_vc
+		map.get(e.getActionCommand()).use(jp, jsp, northjp, close_id, untitled_vc
 				, sequece_name, currentAreaName
 				, currentButton, hmTextArea, hm_name_atrr, hm_name_btn);
-		//没设计好，全局变量currentAreaName不能通过传参放入内部类中
-		if (tmp != null) {
-			tmp.addActionListener(new ActionListener() {
-				
-					@Override
-					public void actionPerformed(ActionEvent e) {
-					if (currentAreaName != tmp.getMapFilePath()) {
-					jsp.remove(hmTextArea.get(currentAreaName));
-					currentAreaName = currentButton.getMapFilePath();
-					currentButton = tmp;
-					jsp.add(hmTextArea.get(currentAreaName));
-					jsp.setViewportView(hmTextArea.get(currentAreaName));
-					jsp.updateUI();
-					}
-				}
-			});
-		}
-		else {
-			
-		}
 	}
 	//new
 	private void newFile(){
@@ -729,6 +722,8 @@ public class MainFrame extends JFrame implements ActionListener{
 	}
 	private void TableDriven(){
 		map.put(ItemName.selectionName[0], new newFile());
+		map.put(ItemName.selectionName[1], new OpenFile());
 		map.put(ItemName.selectionName[3], new SaveSingleOp());
+		map.put(ItemName.selectionName[8], new CloseFile());
 	}
 }

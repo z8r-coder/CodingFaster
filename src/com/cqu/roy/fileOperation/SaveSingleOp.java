@@ -18,19 +18,19 @@ import com.cqu.roy.mywdiget.JpathButton;
 public class SaveSingleOp implements FileOperation{
 	private writeAndread war = new writeAndread();
 	private SaveAssistant sass;
+	private MainFrame mainFrame = MainFrame.getInstance();
 	@Override
-	public JpathButton use(JPanel jp, JScrollPane jsp, JPanel northjp, Vector<Integer> close_id,
+	public void use(JPanel jp, JScrollPane jsp, JPanel northjp, Vector<Integer> close_id,
 			Vector<Integer> untitled_vc, Vector<String> sequece_name, String currentAreaName, JpathButton currentButton,
 			HashMap<String, JTextPane> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
 			HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
 		if (currentAreaName == null || MainFrame.fileCount != 0) {
-			return null;
+			return;
 		}
-		System.out.println("used");
 		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 		
-		if (!textAtrr.getisSave()) {
+		if (!textAtrr.getisSave()) {//为保存过
 			JFileChooser jf = new JFileChooser();
 			MainFrame.fileCount++;
 			int value = jf.showSaveDialog(null);//阻塞
@@ -41,6 +41,7 @@ public class SaveSingleOp implements FileOperation{
 			}else {
 				MainFrame.fileCount--;
 				MainFrame.sureOrcancel = ButtonMsg.CANCLE;
+				mainFrame.requestFocus();
 			}
 		}else if (textAtrr.getisSave()) {
 			/*当文件并非第一次创建的时候，已经保存过了
@@ -48,7 +49,6 @@ public class SaveSingleOp implements FileOperation{
 			File file = new File(textAtrr.getFileAddress());
 			war.saveTo(file, hmTextArea.get(currentAreaName).getText());
 		}
-		return null;
 	}
 
 }

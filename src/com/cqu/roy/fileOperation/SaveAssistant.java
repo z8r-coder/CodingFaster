@@ -14,9 +14,11 @@ import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
 
 public class SaveAssistant {
+	private MainFrame mainFrame = MainFrame.getInstance();
 	private HashMap<String, JTextPane> hmTextArea;
 	private HashMap<String, JpathButton> hm_name_btn;
 	private HashMap<String, TextAtrr> hm_name_atrr;
+	
 	public SaveAssistant(HashMap<String, JTextPane> hmTextArea,HashMap<String, JpathButton> hm_name_btn
 			,HashMap<String, TextAtrr> hm_name_atrr) {
 		// TODO Auto-generated constructor stub
@@ -54,6 +56,9 @@ public class SaveAssistant {
 		temp_btn.setMapFilePath(newName);
 		addMap(newName, temp_area, temp_btn, temp_atrr);
 		temp_btn.setText(file.getName());
+		
+		mainFrame.setCurrentAreaName(newName);
+		mainFrame.setCurrentButton(temp_btn);
 		return newName;
 	}
 	private void removeMap(String name){
