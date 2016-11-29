@@ -50,6 +50,9 @@ import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
+import com.cqu.roy.fileOperation.FileOperation;
+import com.cqu.roy.fileOperation.SaveSingleOp;
+import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MyFontStyle;
 import com.cqu.roy.mywdiget.SaveDialog;
@@ -86,9 +89,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	private Vector<String> sequece_name = new Vector<>();//文件打开的序列;
 	
 	//JFileChooser只能有一个
-	private static int fileCount = 0;
+	public static int fileCount = 0;
 	//在closeFile中获取JFileChooser是按的确定还是取消
-	private static int sureOrcancel;
+	public static int sureOrcancel;
 	
 	//组和键
 	private boolean com_shift = false;
@@ -105,6 +108,10 @@ public class MainFrame extends JFrame implements ActionListener{
 	//dialog 选项与图片
 	Icon icon = new ImageIcon("src/imageResources/warning.png");
 	Object[] selection = {"Save","Cancle","Close Without Saving"};
+	
+	//Table driven
+	HashMap<String, FileOperation> map = new HashMap<>();
+	private FileOperation put;
 	public MainFrame() {
 		// TODO Auto-generated constructor stub
 		Toolkit tool = getToolkit();
@@ -193,7 +200,7 @@ public class MainFrame extends JFrame implements ActionListener{
 						newFile();
 					}
 					else if (com_ctrl && com_W && !com_shift) {
-						closeFileOp(null);
+						closeFileOp();
 					}
 					//new window
 					else if (com_N && com_ctrl && com_shift) {
@@ -237,8 +244,16 @@ public class MainFrame extends JFrame implements ActionListener{
 			}
 		}, AWTEvent.KEY_EVENT_MASK);
 		setVisible(true);
- 	}
+	}
+	//该构造函数专门为其他类提供当前文件路径和当前按钮
 	
+	public String getCurrentAreaName() {
+		return currentAreaName;
+	}
+	
+	public JpathButton getCurrentButton() {
+		return currentButton;
+	}
 	private void initFileMenu(){
 		
 		Filemenu = new JMenu("File");
@@ -263,38 +278,63 @@ public class MainFrame extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getActionCommand().equals(ItemName.selectionName[0])) {// new file
-			newFile();
+//		if (e.getActionCommand().equals(ItemName.selectionName[0])) {// new file
+//			newFile();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[1])) {//open file
+//			openOp();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[2])) {//open folder
+//
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[3])) {//save
+//			saveSingleOp();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[4])) {//save as
+//			
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[5])) {//save all
+//			saveAll();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[6])) {//new window
+//			newWindow();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[7])) {//Close window
+//			closeWindow();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[8])) {//Close file
+//			closeFileOp();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close all file
+//			closeAllFileOp();
+//		}
+//		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//exit
+//			System.exit(0);
+//		}
+		TableDriven();
+		System.out.println(e.getActionCommand());
+		JpathButton tmp = map.get(e.getActionCommand()).use(jp, jsp, northjp, close_id, untitled_vc
+				, sequece_name, currentAreaName
+				, currentButton, hmTextArea, hm_name_atrr, hm_name_btn);
+		//没设计好，全局变量currentAreaName不能通过传参放入内部类中
+		if (tmp != null) {
+			tmp.addActionListener(new ActionListener() {
+				
+					@Override
+					public void actionPerformed(ActionEvent e) {
+					if (currentAreaName != tmp.getMapFilePath()) {
+					jsp.remove(hmTextArea.get(currentAreaName));
+					currentAreaName = currentButton.getMapFilePath();
+					currentButton = tmp;
+					jsp.add(hmTextArea.get(currentAreaName));
+					jsp.setViewportView(hmTextArea.get(currentAreaName));
+					jsp.updateUI();
+					}
+				}
+			});
 		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[1])) {//open file
-			openOp();
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[2])) {//open folder
-
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[3])) {//save
-			saveSingleOp();
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[4])) {//save as
+		else {
 			
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[5])) {//save all
-			saveAll();
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[6])) {//new window
-			newWindow();
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[7])) {//Close window
-			closeWindow();
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[8])) {//Close file
-			closeFileOp(null);
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[9])) {//Close all file
-			closeAllFileOp();
-		}
-		else if (e.getActionCommand().equals(ItemName.selectionName[10])) {//exit
-			System.exit(0);
 		}
 	}
 	//new
@@ -520,7 +560,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		}
 	}
 	//close file
-	private void closeFileOp(String fn){
+	private void closeFileOp(){
 		if (currentAreaName == null) {
 			return;
 		}
@@ -611,7 +651,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		for(String s:seq_clone){
 			currentAreaName = s;
 			currentButton = hm_name_btn.get(s);
-			closeFileOp(s);
+			closeFileOp();
 		}
 	}
 	//new a window
@@ -686,5 +726,9 @@ public class MainFrame extends JFrame implements ActionListener{
 		temp_btn.setText(file.getName());
 		this.requestFocus();
 		return newName;
+	}
+	private void TableDriven(){
+		map.put(ItemName.selectionName[0], new newFile());
+		map.put(ItemName.selectionName[3], new SaveSingleOp());
 	}
 }
