@@ -51,8 +51,10 @@ import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
 import com.cqu.roy.fileOperation.CloseFile;
+import com.cqu.roy.fileOperation.CloseWindow;
 import com.cqu.roy.fileOperation.FileOperation;
 import com.cqu.roy.fileOperation.OpenFile;
+import com.cqu.roy.fileOperation.SaveAll;
 import com.cqu.roy.fileOperation.SaveSingleOp;
 import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.mywdiget.JpathButton;
@@ -208,7 +210,7 @@ public class MainFrame extends JFrame implements ActionListener{
 					}
 					//new window
 					else if (com_N && com_ctrl && com_shift) {
-						newWindow();
+
 					}
 					//close window
 					else if (com_W && com_ctrl && com_shift) {
@@ -647,10 +649,6 @@ public class MainFrame extends JFrame implements ActionListener{
 			closeFileOp();
 		}
 	}
-	//new a window
-	private void newWindow() {
-		new MainFrame();
-	}
 	//close current window
 	private void closeWindow(){
 		this.setVisible(false);
@@ -723,7 +721,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	private void TableDriven(){
 		map.put(ItemName.selectionName[0], new newFile());
 		map.put(ItemName.selectionName[1], new OpenFile());
-		map.put(ItemName.selectionName[3], new SaveSingleOp());
-		map.put(ItemName.selectionName[8], new CloseFile());
+		map.put(ItemName.selectionName[2], new SaveSingleOp());
+		map.put(ItemName.selectionName[4], new SaveAll());
+		map.put(ItemName.selectionName[5], new CloseWindow());
+		map.put(ItemName.selectionName[6], new CloseFile());
 	}
 }

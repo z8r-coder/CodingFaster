@@ -31,6 +31,7 @@ public class CloseFile implements FileOperation{
 	private HashMap<String, JTextPane> hmTextArea;
 	private HashMap<String, JpathButton> hm_name_btn;
 	private HashMap<String, TextAtrr> hm_name_atrr;
+	
 	@Override
 	public void use(JPanel jp, JScrollPane jsp, JPanel northjp, Vector<Integer> close_id, Vector<Integer> untitled_vc,
 			Vector<String> sequece_name, String currentAreaName, JpathButton currentButton,
@@ -47,14 +48,6 @@ public class CloseFile implements FileOperation{
 		
 		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 		if (!textAtrr.getisSave()) {//未保存
-			/*询问用户是否保存该修改的页面*/
-			//此处为了给closeAllfile 复用
-//			String newFileName;
-//			if (fn != null) {
-//				newFileName = fn;
-//			}else{
-//				newFileName = "New file";
-//			}
 			JLabel fontSet = new JLabel("Save changes to " + currentAreaName 
 					+" before closing?");
 			fontSet.setFont(new Font(fontNames[16], Font.BOLD, 15));
@@ -102,30 +95,24 @@ public class CloseFile implements FileOperation{
 			}
 		}
 
-		jsp.remove(hmTextArea.get(currentAreaName));
-		northjp.remove(currentButton);
+		jsp.remove(hmTextArea.get(mainFrame.getCurrentAreaName()));
+		northjp.remove(mainFrame.getCurrentButton());
 
-		removeMap(currentAreaName);//维护表变量
+		removeMap(mainFrame.getCurrentAreaName());//维护表变量
 		
-		int index = sequece_name.indexOf(currentAreaName);
+		int index = sequece_name.indexOf(mainFrame.getCurrentAreaName());
 		if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
-			sequece_name.remove(currentAreaName);
-//			currentAreaName = null;
-//			currentButton = null;
-			mainFrame.setCurrentAreaName(null);
+			sequece_name.remove(mainFrame.getCurrentAreaName());
+			mainFrame.setCurrentAreaName(null);//并将当前页面和按钮置为空
 			mainFrame.setCurrentButton(null);
 			jp.remove(jsp);
 		}
 		else if (index == sequece_name.size() - 1) {
-			sequece_name.remove(currentAreaName);
-//			currentAreaName = sequece_name.get(sequece_name.size() - 1);
-//			currentButton = hm_name_btn.get(currentAreaName);
+			sequece_name.remove(mainFrame.getCurrentAreaName());
 			mainFrame.setCurrentAreaName(sequece_name.get(sequece_name.size() - 1));
 			mainFrame.setCurrentButton(hm_name_btn.get(mainFrame.getCurrentAreaName()));
 		}else {
-			sequece_name.remove(currentAreaName);
-//			currentAreaName = sequece_name.get(index);
-//			currentButton = hm_name_btn.get(currentAreaName);
+			sequece_name.remove(mainFrame.getCurrentAreaName());
 			mainFrame.setCurrentAreaName(sequece_name.get(index));
 			mainFrame.setCurrentButton(hm_name_btn.get(mainFrame.getCurrentAreaName()));
 		}
