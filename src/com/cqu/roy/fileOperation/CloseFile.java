@@ -23,6 +23,7 @@ import com.cqu.roy.mywdiget.SaveDialog;
 
 public class CloseFile implements FileOperation{
 	private MainFrame mainFrame = MainFrame.getInstance();
+	
 	private SaveSingleOp saveSingleOp = new SaveSingleOp();
 	private String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 	private Icon icon = new ImageIcon("src/imageResources/warning.png");
@@ -69,7 +70,7 @@ public class CloseFile implements FileOperation{
 				return;
 			case 2://close without saving
 				close_id.add(textAtrr.getID());
-				untitled_vc.remove((Integer)(hm_name_atrr.get(mainFrame.getCurrentAreaName()).getID()));
+				untitled_vc.remove((Integer)(hm_name_atrr.get(currentAreaName).getID()));
 				break;
 			default:
 				break;
@@ -99,7 +100,7 @@ public class CloseFile implements FileOperation{
 		jsp.remove(hmTextArea.get(currentAreaName));
 		northjp.remove(currentButton);
 
-		removeMap(mainFrame.getCurrentAreaName());//维护表变量
+		removeMap(currentAreaName);//维护表变量
 		
 		int index = sequece_name.indexOf(mainFrame.getCurrentAreaName());
 		if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
