@@ -39,7 +39,11 @@ public class CloseFile implements FileOperation{
 			HashMap<String, JTextPane> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
 			HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
-		System.out.println(sequece_name.size());
+//		System.out.println(sequece_name.size());
+//		System.out.println("current Name:" + mainFrame.getCurrentAreaName());
+//		for(int i = 0; i < sequece_name.size();i++){
+//			System.out.println(sequece_name.get(i));
+//		}
 		if (currentAreaName == null) {
 			return;
 		}
@@ -47,13 +51,13 @@ public class CloseFile implements FileOperation{
 		this.hmTextArea = hmTextArea;
 		this.hm_name_btn = hm_name_btn;
 		this.hm_name_atrr = hm_name_atrr;
-		
+		int selectionValue;
 		TextAtrr textAtrr = hm_name_atrr.get(currentAreaName);
 		if (!textAtrr.getisSave()) {//未保存
 			JLabel fontSet = new JLabel("Save changes to " + currentAreaName 
 					+" before closing?");
 			fontSet.setFont(new Font(fontNames[16], Font.BOLD, 15));
-			int selectionValue = SaveDialog.showOptionDialog(mainFrame, fontSet, "warning"
+			selectionValue = SaveDialog.showOptionDialog(mainFrame, fontSet, "warning"
 					, JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, icon, selection
 					, selection[0], LenthAll.DIALOG_WIDTH, LenthAll.DIALOG_HEIGHT);
@@ -79,7 +83,7 @@ public class CloseFile implements FileOperation{
 			JLabel fontSet = new JLabel("Save changes to " + currentAreaName 
 					+" before closing?");
 			fontSet.setFont(new Font(fontNames[16], Font.BOLD, 15));
-			int selectionValue = SaveDialog.showOptionDialog(mainFrame, fontSet, "warning"
+			selectionValue = SaveDialog.showOptionDialog(mainFrame, fontSet, "warning"
 					, JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, icon, selection
 					, selection[0], 500, 200);
@@ -96,27 +100,26 @@ public class CloseFile implements FileOperation{
 				break;
 			}
 		}
-
-		jsp.remove(hmTextArea.get(currentAreaName));
-		northjp.remove(currentButton);
-
-		removeMap(currentAreaName);//维护表变量
+		
+		jsp.remove(hmTextArea.get(mainFrame.getCurrentAreaName()));
+		northjp.remove(mainFrame.getCurrentButton());
+		removeMap(mainFrame.getCurrentAreaName());//维护表变量
 		
 		int index = sequece_name.indexOf(mainFrame.getCurrentAreaName());
 		if (sequece_name.size() == 1) {//如果只有一页，直接关掉即可
-			sequece_name.remove(currentAreaName);
+			sequece_name.remove(mainFrame.getCurrentAreaName());
 			mainFrame.setCurrentAreaName(null);//并将当前页面和按钮置为空
 			mainFrame.setCurrentButton(null);
 			jp.remove(jsp);
 		}
 		//如过是最后一页，则显示前面一页
 		else if (index == sequece_name.size() - 1) {
-			sequece_name.remove(currentAreaName);
+			sequece_name.remove(mainFrame.getCurrentAreaName());
 			mainFrame.setCurrentAreaName(sequece_name.get(sequece_name.size() - 1));
 			mainFrame.setCurrentButton(hm_name_btn.get(mainFrame.getCurrentAreaName()));
 		//如果在中间，则显示下一页
 		}else {
-			sequece_name.remove(currentAreaName);
+			sequece_name.remove(mainFrame.getCurrentAreaName());
 			mainFrame.setCurrentAreaName(sequece_name.get(index));
 			mainFrame.setCurrentButton(hm_name_btn.get(mainFrame.getCurrentAreaName()));
 		}
