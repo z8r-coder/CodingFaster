@@ -333,6 +333,7 @@ public class MainFrame extends JFrame implements ActionListener{
 				System.exit(0);
 			}
 		}
+		System.out.println(hm_name_atrr.get(currentAreaName).getSuffix());
 	}
 
 	private void TableDriven(){

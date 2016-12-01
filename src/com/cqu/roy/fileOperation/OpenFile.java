@@ -58,7 +58,9 @@ public class OpenFile implements FileOperation{
 				currentAreaName = file.getPath();
 				
 				btn = new JpathButton(file.getName(),file.getPath());
-				//currentButton = btn;
+				
+				textAtrr.setSuffix(getSuffix(currentAreaName));
+				
 				mainFrame.setCurrentButton(btn);//设置当前按钮
 				mainFrame.setCurrentAreaName(currentAreaName);//设置当前路径
 				
@@ -97,5 +99,10 @@ public class OpenFile implements FileOperation{
 		hmTextArea.put(name, jtp);
 		hm_name_btn.put(name, btn);
 		hm_name_atrr.put(name, atrr);
+	}
+	
+	private String getSuffix(String fileName){
+		String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+		return suffix;
 	}
 }

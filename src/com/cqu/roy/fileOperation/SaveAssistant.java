@@ -54,6 +54,7 @@ public class SaveAssistant {
 		sequece_name.insertElementAt(newName, index);
 		
 		temp_btn.setMapFilePath(newName);
+		temp_atrr.setSuffix(getSuffix(newName));//
 		addMap(newName, temp_area, temp_btn, temp_atrr);
 		temp_btn.setText(file.getName());
 		
@@ -70,5 +71,10 @@ public class SaveAssistant {
 		hmTextArea.put(name, jtp);
 		hm_name_btn.put(name, btn);
 		hm_name_atrr.put(name, atrr);
+	}
+	
+	private String getSuffix(String fileName){
+		String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+		return suffix;
 	}
 }

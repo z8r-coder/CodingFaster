@@ -16,7 +16,7 @@ import javax.swing.JTextPane;
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.constant.LenthAll;
-import com.cqu.roy.main.main;
+
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.SaveDialog;
@@ -100,7 +100,7 @@ public class CloseFile implements FileOperation{
 				break;
 			}
 		}
-		
+
 		jsp.remove(hmTextArea.get(mainFrame.getCurrentAreaName()));
 		northjp.remove(mainFrame.getCurrentButton());
 		removeMap(mainFrame.getCurrentAreaName());//维护表变量

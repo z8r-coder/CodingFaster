@@ -5,6 +5,7 @@ public class TextAtrr {
 	private int ID;//若被保存，则无效,为0，若未被保存，则判断是第几个未被保存的文件，用来命名untitled
 	private String filename = null;//被保存了的时候为有效位。
 	private String fileAddress = null;//被保存了的时候为有效位
+	private String Suffix = null;//文件的后缀
 	
 	public TextAtrr(boolean isSave,int ID,String filename,String fileAddress) {
 		// TODO Auto-generated constructor stub
@@ -37,5 +38,13 @@ public class TextAtrr {
 	}
 	public String getFileAddress() {
 		return fileAddress;
+	}
+	
+	public void setSuffix(String Suffix) {
+		this.Suffix = Suffix;
+	}
+	
+	public String getSuffix() {
+		return Suffix;
 	}
 }

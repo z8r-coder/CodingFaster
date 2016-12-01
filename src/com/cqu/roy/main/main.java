@@ -10,7 +10,6 @@ import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.SaveDialog;
 
 public class main {
-
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		MainFrame.getInstance();
