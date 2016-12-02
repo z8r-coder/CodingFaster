@@ -14,7 +14,7 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//MainFrame.getInstance();
-		RexPlay rPlay = new RexPlay("     dsa\\auto   321&auto&sa  auto break& auto*dddsa "
-				+ "IOIO auto sioioijio    iohin ojo break() ifif() 123");
+		RexPlay rPlay = new RexPlay("     dsaif  321&if&break*sa  if() break& auto*dddsa "
+				+ "IOIO if sioioijio    iohin ojo break() ifif() 123");
 	}
 }
