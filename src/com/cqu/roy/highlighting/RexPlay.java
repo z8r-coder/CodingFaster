@@ -31,12 +31,12 @@ public class RexPlay {
 		//C语言
 		
 		String[] temp = splitString(textLine);
-		matcheKeyWord(temp);
+		matchesKeyWord(temp);
 		//System.out.println(b);
 	}
 	
 	//红色字体
-	public void matcheKeyWord(String[] line) {
+	public void matchesKeyWord(String[] line) {
 		//if匹配的时候与A-Z a-z 0-9中间至少夹着一个特殊字符
 		generaterStringReg();
 		Pattern pattern = Pattern.compile(hm_type_regex.get("auto"));
