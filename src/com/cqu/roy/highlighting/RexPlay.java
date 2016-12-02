@@ -46,22 +46,29 @@ public class RexPlay {
 	public void matchesprefixAndsuffixKeyWord(String[] line) {
 		//if匹配的时候与A-Z a-z 0-9中间至少夹着一个特殊字符
 		generaterStringReg();
-		Pattern pattern;
-		for (int i = 0; i < KeyWord.KeyWord_C.length; i++) {
-			pattern = Pattern.compile(hm_wold_regex.get(KeyWord.KeyWord_C[i]));
-			for(int j = 0; j < line.length;j++){
-				Matcher matcher = pattern.matcher(line[j]);
-				if (matcher.matches()) {
-					Vector<Token> vector = matchesKeyWord(line[j]);
+		String allRegex = null;
+		
+		//获取整个正则表达式
+		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
+			if (i == 0) {
+				allRegex = hm_wold_regex.get(KeyWord.KeyWord_C[i]);
+			}else {
+				allRegex = allRegex + "|" + hm_wold_regex.get(KeyWord.KeyWord_C[i]);
+			}
+		}
+		Pattern pattern = Pattern.compile(allRegex);
+		for(int j = 0; j < line.length;j++){
+			Matcher matcher = pattern.matcher(line[j]);
+			if (matcher.matches()) {
+				//System.out.println(line[j]);
+				Vector<Token> vector = matchesKeyWord(line[j]);
 					for(int k = 0;k < vector.size();k++){
 						Token token = vector.get(k);
 						System.out.println(token.getValue() + "  " + "start:" 
 								+ token.getStartPosition() + "  end:" + token.getEndPosition()
 								+ " length:" + token.getLength());
-					}
-					//System.out.println(line[j]);
-				}	
-			}
+				}
+			}	
 		}
 	}
 	//从带前缀后缀的关键词中匹配出关键词
@@ -98,13 +105,15 @@ public class RexPlay {
 				}
 				else {
 					startPosition = startPosition + matcher.start();
-					endPosition = startPosition + matcher.end() - 1;
+					endPosition = startPosition - matcher.start() + matcher.end() - 1;
 					Token token = new Token(matcher.group(0), startPosition
 							, endPosition, matcher.end() - matcher.start());
+					vc_token.add(token);
+					startPosition = startPosition + matcher.end() - matcher.start();
 				}
 				prefixAndSuffixKeyWord = prefixAndSuffixKeyWord.substring(matcher.end());
-				System.out.println();
-				System.out.println(prefixAndSuffixKeyWord);
+//				System.out.println();
+//				System.out.println(prefixAndSuffixKeyWord);
 				count++;
 			}else {
 				break;
