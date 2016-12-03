@@ -18,12 +18,18 @@ import com.cqu.roy.fileOperation.newFile;
 public class RexPlay {
 	private String textLine;
 	//匹配关键字的前缀
-	private final static String prefix = ".*[^A-Za-z0-9]+";
+	private final static String prefix = "[^//s].*[^A-Za-z0-9//s]+[^//s]";
 	//匹配关键字的后缀
-	private final static String suffix = "[^A-Za-z0-9]+.*";
-	//
+	private final static String suffix = "[^//sA-Za-z0-9]+[^//s].*[^//s]";
+	//每个需要渲染token的绝对位置
 	private Vector<Token> vc_absOffset;
-	
+	//每个需要渲染token的内相对位置
+	private Vector<Token> vc_relativeInOffset;
+	//每个词素中存在多少个需要匹配的关键字
+	private Vector<Token> vc_relativeOutOffset;
+	//每个分离出来的词素中能够提取多少个关键词
+	private Vector<Integer> keyWordNum;
+	String allRegex = null;
 	//private final static String matchBreak = "break|.*[^A-Za-z0-9]+break|break[^A-Za-z0-9]+.*|.*[^A-Za-z0-9]+break[^A-Za-z0-9]+.*";
 	
 	//存放关键词保留字
@@ -35,19 +41,10 @@ public class RexPlay {
 		this.textLine = textLine;
 		//C语言
 		vc_absOffset = new Vector<>();
-		String[] temp = splitString(textLine);
-		matchesprefixAndsuffixKeyWord(temp);
-		matchesKeyWord("dsadsbreakdasif");
-		//System.out.println(b);
-	}
-	
-	//红色字体
-	//匹配带前缀后缀的关键词
-	public void matchesprefixAndsuffixKeyWord(String[] line) {
-		//if匹配的时候与A-Z a-z 0-9中间至少夹着一个特殊字符
-		generaterStringReg();
-		String allRegex = null;
+		vc_relativeInOffset = new Vector<>();
+		keyWordNum = new Vector<>();
 		
+		generaterStringReg();
 		//获取整个正则表达式
 		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
 			if (i == 0) {
@@ -56,27 +53,86 @@ public class RexPlay {
 				allRegex = allRegex + "|" + hm_wold_regex.get(KeyWord.KeyWord_C[i]);
 			}
 		}
+		String[] splitString = splitString(textLine);
+		matchesprefixAndsuffixKeyWord(splitString);
+		getTheAbsLocation(textLine);
+		for(int k = 0;k < vc_relativeInOffset.size();k++){
+			Token token = vc_relativeInOffset.get(k);
+			System.out.println(token.getValue() + "  " + "start:" 
+					+ token.getStartPosition() + "  end:" + token.getEndPosition()
+					+ " length:" + token.getLength());
+		}
+		System.out.println();
+		for(int k = 0;k < vc_absOffset.size();k++){
+			Token token = vc_absOffset.get(k);
+			System.out.println(token.getValue() + "  " + "start:" 
+					+ token.getStartPosition() + "  end:" + token.getEndPosition()
+					+ " length:" + token.getLength());
+		}
+	}
+	public void getTheAbsLocation(String textLine) {
+		Pattern pattern = Pattern.compile(allRegex);
+		int count = 0;//计数带前后缀
+		int num = 0;//计数关键词
+		int startPosition = 0;
+		int endPosition = 0;
+//		Matcher matcher = pattern.matcher(textLine);
+//		matcher.find();
+//		System.out.println(matcher.start());
+//		System.out.println(matcher.end());
+		while(true){
+			Matcher matcher = pattern.matcher(textLine);
+			if (matcher.find()) {
+				if (count == 0) {
+					for(int i = 0;i < keyWordNum.get(count);i++){
+						Token temp = vc_relativeInOffset.get(i + num);
+						Token token = new Token(temp.getValue()
+								, matcher.start() + temp.getStartPosition()
+								, matcher.end() - temp.getEndPosition() - 1
+								, temp.getLength());
+						vc_absOffset.add(token);
+					}
+					num = num + keyWordNum.get(count);
+					startPosition = matcher.end();
+				}else {
+					startPosition = startPosition + matcher.start();
+					endPosition = startPosition - matcher.start() + matcher.end() - 1;
+					for(int i = 0; i < keyWordNum.get(count);i++){
+						Token temp = vc_relativeInOffset.get(i + num);
+						Token token = new Token(temp.getValue()
+								, startPosition,endPosition, temp.getLength());
+						vc_absOffset.add(token);
+					}
+					num = num + keyWordNum.get(count);
+					startPosition = startPosition + matcher.end() - matcher.start();
+				}
+				textLine = textLine.substring(matcher.end());
+				count++;
+			}else {
+				break;
+			}
+		}
+	}
+	//红色字体
+	//匹配带前缀后缀的关键词
+	public void matchesprefixAndsuffixKeyWord(String[] line) {
+		//if匹配的时候与A-Z a-z 0-9中间至少夹着一个特殊字符
+		
 		Pattern pattern = Pattern.compile(allRegex);
 		for(int j = 0; j < line.length;j++){
 			Matcher matcher = pattern.matcher(line[j]);
 			if (matcher.matches()) {
-				//System.out.println(line[j]);
-				Vector<Token> vector = matchesKeyWord(line[j]);
-					for(int k = 0;k < vector.size();k++){
-						Token token = vector.get(k);
-						System.out.println(token.getValue() + "  " + "start:" 
-								+ token.getStartPosition() + "  end:" + token.getEndPosition()
-								+ " length:" + token.getLength());
-				}
+				System.out.println(line[j]);
+				matchesKeyWord(line[j]);
 			}	
 		}
+		System.out.println();
 	}
 	//从带前缀后缀的关键词中匹配出关键词
-	public Vector<Token> matchesKeyWord(String prefixAndSuffixKeyWord){
+	public void matchesKeyWord(String prefixAndSuffixKeyWord){
 		String matchRegex = null;
 		//存放从一段带前缀后缀中匹配出来的关键字,并在这个Token中存放其位置长度值信息
-		//断的内偏移量
-		Vector<Token> vc_token = new Vector<>();
+		//段内偏移量
 		//"if|else|"
 		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
 			//begin
@@ -100,7 +156,7 @@ public class RexPlay {
 				if (count == 0) {
 					Token token = new Token(matcher.group(0), matcher.start()
 							, matcher.end() - 1, matcher.end() - matcher.start());
-					vc_token.add(token);
+					vc_relativeInOffset.add(token);
 					startPosition = matcher.end();
 				}
 				else {
@@ -108,19 +164,18 @@ public class RexPlay {
 					endPosition = startPosition - matcher.start() + matcher.end() - 1;
 					Token token = new Token(matcher.group(0), startPosition
 							, endPosition, matcher.end() - matcher.start());
-					vc_token.add(token);
+					vc_relativeInOffset.add(token);
 					startPosition = startPosition + matcher.end() - matcher.start();
 				}
 				prefixAndSuffixKeyWord = prefixAndSuffixKeyWord.substring(matcher.end());
-//				System.out.println();
-//				System.out.println(prefixAndSuffixKeyWord);
 				count++;
 			}else {
+				keyWordNum.add(count);
 				break;
 			}
 		}
-		return vc_token;
 	}
+
 	public String[] splitString (String str) {
 		str.trim();
 		Pattern pattern = Pattern.compile("[ ]+");
