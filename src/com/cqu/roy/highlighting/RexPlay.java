@@ -23,12 +23,8 @@ public class RexPlay {
 	private final static String prefix = ".*[^A-Za-z0-9]+";
 	//匹配关键字的后缀
 	private final static String suffix = "[^A-Za-z0-9]+.*";
-	//每个需要渲染token的绝对位置
-	private Vector<Token> vc_absOffset;
 	//每个需要渲染token的内相对位置
 	private Vector<Token> vc_relativeInOffset;
-	//每个词素中存在多少个需要匹配的关键字
-	private Vector<Token> vc_relativeOutOffset;
 	//每个分离出来的词素中能够提取多少个关键词
 	private Vector<Integer> keyWordNum;
 	//每个分离出来带前缀后缀token的集合
@@ -48,7 +44,6 @@ public class RexPlay {
 		// TODO Auto-generated constructor stub
 		this.textLine = textLine;
 		//C语言
-		vc_absOffset = new Vector<>();
 		vc_relativeInOffset = new Vector<>();
 		keyWordNum = new Vector<>();
 		
@@ -70,31 +65,17 @@ public class RexPlay {
 			}
 		}
 		splitString = splitString(sp);
-//		for(int i = 0; i < splitString.length;i++){
-//			System.out.println(splitString[i]);
-//		}
-		System.out.println();
 		matchesprefixAndsuffixKeyWord(splitString);
 		
-		getTheAbsLocation(textLine);
 		for(int k = 0;k < vc_relativeInOffset.size();k++){
 			Token token = vc_relativeInOffset.get(k);
+			token.setLocation(token.getAbsLocation() + token.getStartPosition());
 			System.out.println(token.getValue() + "  " + "start:" 
-					+ (token.getAbsLocation() + token.getStartPosition()) + 
+					+ token.getLocation() + 
 					"  end:" + (token.getAbsLocation() + token.getStartPosition() + token.getLength())
 					+ " length:" + token.getLength());
 		}
-		for(int k = 0;k < vc_absOffset.size();k++){
-			Token token = vc_absOffset.get(k);
-//			System.out.println(token.getValue() + "  " + "start:" 
-//					+ token.getStartPosition() + "  end:" + token.getEndPosition()
-//					+ " length:" + token.getLength());
-		}
 		
-		//System.out.println(absLocation.size());
-//		for(int i = 0; i < absLocation.size();i++){
-//			System.out.println(absLocation.get(i));
-//		}
 	}
 	//数出绝对位置
 	public void countingAbsLocation(String textLine,String[] line) {
@@ -102,7 +83,6 @@ public class RexPlay {
 		int count_token = 0;//计数第几个分离的串
 		for(int i = 0; i < textLine.length();){
 			if (textLine.charAt(i) == ' ') {
-				//System.out.println(i);
 				i++;
 			}else {
 				if (count_pre_su == pre_su.size()) {
@@ -110,54 +90,10 @@ public class RexPlay {
 				}
 				if (line[count_token] == pre_su.get(count_pre_su)) {
 					absLocation.add(i);
-					//System.out.println(absLocation.get(count_pre_su));
 					count_pre_su++;
 				}
 				i = line[count_token].length() + i;
 				count_token++;
-			}
-		}
-	}
-	public void getTheAbsLocation(String textLine) {
-		Pattern pattern = Pattern.compile(allRegex);
-		int count = 0;//计数带前后缀
-		int num = 0;//计数关键词
-		int startPosition = 0;
-		int endPosition = 0;
-//		Matcher matcher = pattern.matcher(textLine);
-//		matcher.find();
-//		System.out.println(matcher.start());
-//		System.out.println(matcher.end());
-		while(true){
-			Matcher matcher = pattern.matcher(textLine);
-			if (matcher.find()) {
-				if (count == 0) {
-					for(int i = 0;i < keyWordNum.get(count);i++){
-						Token temp = vc_relativeInOffset.get(i + num);
-						Token token = new Token(temp.getValue()
-								, matcher.start() + temp.getStartPosition()
-								, matcher.end() - temp.getEndPosition() - 1
-								, temp.getLength());
-						vc_absOffset.add(token);
-					}
-					num = num + keyWordNum.get(count);
-					startPosition = matcher.end();
-				}else {
-					startPosition = startPosition + matcher.start();
-					endPosition = startPosition - matcher.start() + matcher.end() - 1;
-					for(int i = 0; i < keyWordNum.get(count);i++){
-						Token temp = vc_relativeInOffset.get(i + num);
-						Token token = new Token(temp.getValue()
-								, startPosition,endPosition, temp.getLength());
-						vc_absOffset.add(token);
-					}
-					num = num + keyWordNum.get(count);
-					startPosition = startPosition + matcher.end() - matcher.start();
-				}
-				textLine = textLine.substring(matcher.end());
-				count++;
-			}else {
-				break;
 			}
 		}
 	}

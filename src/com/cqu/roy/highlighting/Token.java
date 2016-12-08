@@ -6,6 +6,7 @@ public class Token {
 	private int EndPosition;
 	private int length;
 	private int absLocation;
+	private int location;
 	
 	public Token(String value,int StartPosition,int EndPosition,int length) {
 		// TODO Auto-generated constructor stub
@@ -35,5 +36,11 @@ public class Token {
 	}
 	public int getAbsLocation() {
 		return absLocation;
+	}
+	public void setLocation(int location) {
+		this.location = location;
+	}
+	public int getLocation() {
+		return location;
 	}
 }
