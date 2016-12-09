@@ -17,6 +17,7 @@ import javax.swing.text.StyledDocument;
 
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.constant.LenthAll;
+import com.cqu.roy.highlighting.SyntaxHighlighter;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MyFontStyle;
@@ -52,6 +53,9 @@ public class newFile implements FileOperation{
 		sequece_name.add(currentAreaName);
 
 		JTextPane jtp = new JTextPane();
+		//设置文本监听，当文本改变时候，进行保留字的高亮渲染
+		jtp.getDocument().addDocumentListener(new SyntaxHighlighter(jtp));
+//		Thread thread = new Thread(Colo)
 		textPaneStyle(jtp,"Style06");
 		JpathButton switchbtn = new JpathButton(currentAreaName,currentAreaName);
 		
