@@ -6,6 +6,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.PlainView;
 import javax.swing.text.Segment;
+import javax.swing.text.StyledDocument;
 
 public class TextEditorView extends PlainView{
 
@@ -16,6 +17,7 @@ public class TextEditorView extends PlainView{
 	protected int drawSelectedText(Graphics g, int x, int y, int p0, int p1) 
 			throws BadLocationException{
 		Segment segment = new Segment();
+		
 		return p1;
 		
 	}
