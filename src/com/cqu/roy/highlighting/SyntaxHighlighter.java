@@ -15,7 +15,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 public class SyntaxHighlighter implements DocumentListener{
-	private Style keywordStyle;
+	private Style keywordStyle;//
 	private Style normalStyle;
 	private Set<String> keywords;
 	private RexPlay rPlay;
