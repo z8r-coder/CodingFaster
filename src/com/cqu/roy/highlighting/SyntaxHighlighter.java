@@ -19,18 +19,21 @@ import javax.swing.text.StyledDocument;
 public class SyntaxHighlighter implements DocumentListener{
 	private Style keywordStyle;//
 	private Style normalStyle;
+	private Style typeStyle;
 	private Set<String> keywords;
 	private RexPlay rPlay;
 	private JTextPane jtp;
-	private Vector<Token> vc_token;
+	private Vector<Token> vc_KeyWord_token;
+	private Vector<Token> vc_Type_token;
 	
 	public SyntaxHighlighter(JTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		keywordStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
+		typeStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
 		normalStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
 		//渲染颜色
-		StyleConstants.setForeground(keywordStyle, Color.RED);
-		
+		StyleConstants.setForeground(keywordStyle, Color.RED);	
+		StyleConstants.setForeground(typeStyle, Color.BLUE);
 		StyleConstants.setForeground(normalStyle, Color.BLACK);
 		
 		this.jtp = jtp;
@@ -42,74 +45,27 @@ public class SyntaxHighlighter implements DocumentListener{
 			e.printStackTrace();
 		}
 		
-		keywords = new HashSet<String>();
-		keywords.add("public");
-		keywords.add("protected");
-		keywords.add("private");
-		keywords.add("_int9");
-		keywords.add("float");
-		keywords.add("double");
 	}
 	
 	public void colouring(StyledDocument doc,int pos,int len) throws BadLocationException{
-//		int start = indexOfWordStart(doc,pos);
-//		int end = indexOfWordEnd(doc, pos + len);
-//		
-//		char ch;
-//		while(start < end){
-//			ch = getCharAt(doc, pos);
-//			if (Character.isLetter(ch) || ch == '_') {
-//				start = colouringWord(doc, start);
-//			}else {
-//				SwingUtilities.invokeLater(new ColouringTask(doc, start, 1, normalStyle));
-//				++start;
-//			}
-//		}
 		colouringWord(doc, 0);
 	}
 	
-	public int colouringWord(StyledDocument doc, int pos) throws BadLocationException {
-		int wordEnd = indexOfWordEnd(doc, pos);
-
-//		if (keywords.contains(word)) {
-//			// 如果是关键字, 就进行关键字的着色, 否则使用普通的着色.
-//			// 这里有一点要注意, 在insertUpdate和removeUpdate的方法调用的过程中, 不能修改doc的属性.
-//			// 但我们又要达到能够修改doc的属性, 所以把此任务放到这个方法的外面去执行.
-//			// 实现这一目的, 可以使用新线程, 但放到swing的事件队列里去处理更轻便一点.
-//			SwingUtilities.invokeLater(new ColouringTask(doc, pos, wordEnd - pos, keywordStyle));
-//		} else {
-//			SwingUtilities.invokeLater(new ColouringTask(doc, pos, wordEnd - pos, normalStyle));
-//		}
-		//doc.setCharacterAttributes(0, jtp.getDocument().getLength(), normalStyle, true);
+	public void colouringWord(StyledDocument doc, int pos) throws BadLocationException {
 		SwingUtilities.invokeLater(new ColouringTask(doc, 0, doc.getLength(), normalStyle));
-		for(int i = 0; i < vc_token.size();i++){
-			Token token = vc_token.get(i);
-			System.out.println("value:" + token.getValue() + " start:" + token.getLocation());
+		for(int i = 0; i < vc_KeyWord_token.size();i++){
+			Token token = vc_KeyWord_token.get(i);
+//			System.out.println("value:" + token.getValue() + " start:" + token.getLocation());
 			SwingUtilities.invokeLater(new ColouringTask(doc,token.getLocation()
 					,token.getLength() ,keywordStyle));
 		}
-		return wordEnd;
+		for(int i = 0; i < vc_Type_token.size();i++){
+			Token token = vc_Type_token.get(i);
+			SwingUtilities.invokeLater(new ColouringTask(doc, token.getLocation()
+					, token.getLength(), typeStyle));
+		}
 	}
 	
-	public int indexOfWordStart(Document doc,int pos)throws BadLocationException {
-		for(;pos > 0 && isWordCharacter(doc, pos - 1); --pos);
-		return pos;
-	}
-	
-	public int indexOfWordEnd(Document doc,int pos) throws BadLocationException {
-		for(;isWordCharacter(doc, pos);++pos);
-		return pos;
-	}
-	
-	public char getCharAt(Document doc, int pos) throws BadLocationException {
-		return doc.getText(pos, 1).charAt(0);
-	}
-	
-	public boolean isWordCharacter(Document doc, int pos) throws BadLocationException {
-		char ch = getCharAt(doc, pos);
-		if (Character.isLetter(ch) || Character.isDigit(ch) || ch == '_') { return true; }
-		return false;
-	}
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
@@ -117,13 +73,14 @@ public class SyntaxHighlighter implements DocumentListener{
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
-				vc_token = rPlay.getToken();
+				vc_KeyWord_token = rPlay.getKeyWordToken();
+				vc_Type_token = rPlay.getTypeToken();
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), e.getLength());
-			System.out.println("insert:" + e.getOffset());
+//			System.out.println("insert:" + e.getOffset());
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
@@ -137,13 +94,14 @@ public class SyntaxHighlighter implements DocumentListener{
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
-				vc_token = rPlay.getToken();
+				vc_KeyWord_token = rPlay.getKeyWordToken();
+				vc_Type_token = rPlay.getTypeToken();
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), 0);
-			System.out.println("remove:" + e.getOffset());
+//			System.out.println("remove:" + e.getOffset());
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
