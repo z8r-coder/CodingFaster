@@ -67,15 +67,17 @@ public class RexPlay {
 		splitString = splitString(sp);
 		matchesprefixAndsuffixKeyWord(splitString);
 		
-		for(int k = 0;k < vc_relativeInOffset.size();k++){
-			Token token = vc_relativeInOffset.get(k);
-			token.setLocation(token.getAbsLocation() + token.getStartPosition());
-			System.out.println(token.getValue() + "  " + "start:" 
-					+ token.getLocation() + 
-					"  end:" + (token.getAbsLocation() + token.getStartPosition() + token.getLength())
-					+ " length:" + token.getLength());
-		}
-		
+//		for(int k = 0;k < vc_relativeInOffset.size();k++){
+//			Token token = vc_relativeInOffset.get(k);
+//			token.setLocation(token.getAbsLocation() + token.getStartPosition());
+//			System.out.println(token.getValue() + "  " + "start:" 
+//					+ token.getLocation() + 
+//					"  end:" + (token.getAbsLocation() + token.getStartPosition() + token.getLength())
+//					+ " length:" + token.getLength());
+//		}
+	}
+	public Vector<Token> getToken() {
+		return vc_relativeInOffset;
 	}
 	//数出绝对位置
 	public void countingAbsLocation(String textLine,String[] line) {
