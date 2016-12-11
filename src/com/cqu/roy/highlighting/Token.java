@@ -1,12 +1,12 @@
 package com.cqu.roy.highlighting;
 
 public class Token {
-	private String value;
-	private int StartPosition;
-	private int EndPosition;
-	private int length;
-	private int absLocation;
-	private int location;
+	private String value;//值
+	private int StartPosition;//绝对起始位置
+	private int EndPosition;//结束位置
+	private int length;//长度
+	private int absLocation;//段内偏移位置
+	private int location;//绝对位置
 	
 	public Token(String value,int StartPosition,int EndPosition,int length) {
 		// TODO Auto-generated constructor stub

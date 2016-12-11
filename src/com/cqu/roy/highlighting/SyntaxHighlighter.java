@@ -29,7 +29,8 @@ public class SyntaxHighlighter implements DocumentListener{
 		keywordStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
 		normalStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
 		//渲染颜色
-		StyleConstants.setForeground(keywordStyle, Color.BLUE);
+		StyleConstants.setForeground(keywordStyle, Color.RED);
+		
 		StyleConstants.setForeground(normalStyle, Color.BLACK);
 		
 		this.jtp = jtp;
@@ -69,7 +70,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	
 	public int colouringWord(StyledDocument doc, int pos) throws BadLocationException {
 		int wordEnd = indexOfWordEnd(doc, pos);
-		String word = doc.getText(pos, wordEnd - pos);
+
 //		if (keywords.contains(word)) {
 //			// 如果是关键字, 就进行关键字的着色, 否则使用普通的着色.
 //			// 这里有一点要注意, 在insertUpdate和removeUpdate的方法调用的过程中, 不能修改doc的属性.
@@ -80,9 +81,12 @@ public class SyntaxHighlighter implements DocumentListener{
 //			SwingUtilities.invokeLater(new ColouringTask(doc, pos, wordEnd - pos, normalStyle));
 //		}
 		//doc.setCharacterAttributes(0, jtp.getDocument().getLength(), normalStyle, true);
+		SwingUtilities.invokeLater(new ColouringTask(doc, 0, doc.getLength(), normalStyle));
 		for(int i = 0; i < vc_token.size();i++){
 			Token token = vc_token.get(i);
-			SwingUtilities.invokeLater(new ColouringTask(doc,token.getAbsLocation(),token.getLength() ,keywordStyle));
+			System.out.println("value:" + token.getValue() + " start:" + token.getLocation());
+			SwingUtilities.invokeLater(new ColouringTask(doc,token.getLocation()
+					,token.getLength() ,keywordStyle));
 		}
 		return wordEnd;
 	}
@@ -119,6 +123,7 @@ public class SyntaxHighlighter implements DocumentListener{
 				e1.printStackTrace();
 			}
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), e.getLength());
+			System.out.println("insert:" + e.getOffset());
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
@@ -132,13 +137,13 @@ public class SyntaxHighlighter implements DocumentListener{
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
-				
+				vc_token = rPlay.getToken();
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			vc_token = rPlay.getToken();
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), 0);
+			System.out.println("remove:" + e.getOffset());
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}

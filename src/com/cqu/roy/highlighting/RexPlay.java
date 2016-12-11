@@ -58,23 +58,25 @@ public class RexPlay {
 		}
 		//去掉字符串开头的space
 		String sp = textLine;
+		
 		for(int i = 0; i < textLine.length();i++){
 			if (textLine.charAt(i) != ' ') {
 				sp = sp.substring(i);
 				break;
 			}
 		}
+		//sp = sp.replace('\n', '\t');
 		splitString = splitString(sp);
 		matchesprefixAndsuffixKeyWord(splitString);
 		
-//		for(int k = 0;k < vc_relativeInOffset.size();k++){
-//			Token token = vc_relativeInOffset.get(k);
-//			token.setLocation(token.getAbsLocation() + token.getStartPosition());
-//			System.out.println(token.getValue() + "  " + "start:" 
-//					+ token.getLocation() + 
-//					"  end:" + (token.getAbsLocation() + token.getStartPosition() + token.getLength())
-//					+ " length:" + token.getLength());
-//		}
+		for(int k = 0;k < vc_relativeInOffset.size();k++){
+			Token token = vc_relativeInOffset.get(k);
+			token.setLocation(token.getAbsLocation() + token.getStartPosition());
+			System.out.println(token.getValue() + "  " + "Location:" 
+					+ token.getLocation() +  " AbsLocation:" + token.getAbsLocation() + 
+					"  end:" + (token.getAbsLocation() + token.getStartPosition() + token.getLength())
+					+ " length:" + token.getLength());
+		}
 	}
 	public Vector<Token> getToken() {
 		return vc_relativeInOffset;
@@ -84,7 +86,8 @@ public class RexPlay {
 		int count_pre_su = 0;//计数能匹配第几个前缀后缀的词素
 		int count_token = 0;//计数第几个分离的串
 		for(int i = 0; i < textLine.length();){
-			if (textLine.charAt(i) == ' ') {
+			if (textLine.charAt(i) == ' ' || textLine.charAt(i) == '\n' 
+					 || textLine.charAt(i) == '\r' ) {
 				i++;
 			}else {
 				if (count_pre_su == pre_su.size()) {
@@ -114,6 +117,7 @@ public class RexPlay {
 		countingAbsLocation(textLine,splitString);
 		for(int i = 0; i < pre_su.size();i++){
 			matchesKeyWord(pre_su.get(i));
+			System.out.println(pre_su.get(i));
 		}
 	}
 	//从带前缀后缀的关键词中匹配出关键词
@@ -131,16 +135,18 @@ public class RexPlay {
 				matchRegex = matchRegex + "|" + KeyWord.KeyWord_C[i];
 			}
 		}
-		Pattern pattern = Pattern.compile(matchRegex);
+		Pattern pattern = Pattern.compile(matchRegex);//匹配关键字
+		Pattern pattern_pre_su = Pattern.compile(allRegex);//在使用subString的时候还要检查新的String是否满足前后缀的条件
 		//在带前缀后缀的子串中可能包含着多个关键词的信息如 dwq&if*daw(break)qwq
 		//此处就包含了多个关键词，通过while循环代替递归的方式，将起寻找完，并将其信息
 		//存在Token对象中
 		int count = 0;//计数
 		int startPosition = 0;
 		int endPosition = 0;
-		while(true){		
+		while(true){
+			Matcher matcher_pre_su = pattern_pre_su.matcher(prefixAndSuffixKeyWord);
 			Matcher matcher = pattern.matcher(prefixAndSuffixKeyWord);
-			if (matcher.find()) {
+			if (matcher.find() && matcher_pre_su.matches()) {
 				if (count == 0) {
 					Token token = new Token(matcher.group(0), matcher.start()
 							, matcher.end() - 1, matcher.end() - matcher.start());
@@ -169,7 +175,7 @@ public class RexPlay {
 
 	public String[] splitString (String str) {
 		str.trim();
-		Pattern pattern = Pattern.compile("[ ]+");
+		Pattern pattern = Pattern.compile("[ ]+|[\\n]");
 		String[] temp = pattern.split(str);
 		
 		return temp;
