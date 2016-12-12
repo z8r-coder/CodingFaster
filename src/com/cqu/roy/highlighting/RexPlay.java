@@ -2,6 +2,9 @@ package com.cqu.roy.highlighting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,11 +26,8 @@ public class RexPlay {
 	private final static String prefix = ".*[^A-Za-z0-9]+";
 	//匹配关键字的后缀
 	private final static String suffix = "[^A-Za-z0-9]+.*";
-	//每个需要渲染token的内相对位置
-	//关键字集合
-	private Vector<Token> vc_KeyWord;
-	//类型集合
-	private Vector<Token> vc_Type;
+	//每个token的信息
+	private Vector<Token> vc_token;
 	//每个分离出来的词素中能够提取多少个关键词
 	private Vector<Integer> keyWordNum;
 	//每个分离出来带前缀后缀token的集合
@@ -38,10 +38,14 @@ public class RexPlay {
 	private String allRegex_KeyWord = null;
 	//类型的正则表达式
 	private String allRegex_Type = null;
+	//所有word模式的正则表达式
+	private String allRegex = null;
 	//不带前缀后缀关键字的正则表达式
 	private String matches_keyword_regex = null;
 	//不带前缀后缀类型的正则表达式
 	private String matches_type_regex = null;
+	//所有保留字
+	private String matches_regex = null;
 	//计数每个词素绝对位置
 	private int abs_count = 0;
 	//private final static String matchBreak = "break|.*[^A-Za-z0-9]+break|break[^A-Za-z0-9]+.*|.*[^A-Za-z0-9]+break[^A-Za-z0-9]+.*";
@@ -50,14 +54,20 @@ public class RexPlay {
 	private HashMap<String, String> hm_wold_regex = new HashMap<>();
 	//存放类型保留字
 	private HashMap<String, String> hm_type_regex = new HashMap<>();
+	//type表
+	private Set<String> typeWord;
+	//keyword表
+	private Set<String> keyWord;
 	public RexPlay(String textLine) {
 		// TODO Auto-generated constructor stub
 		this.textLine = textLine;
 		//C语言
-		vc_KeyWord = new Vector<>();
-		vc_Type = new Vector<>();
+
 		keyWordNum = new Vector<>();
 		
+		typeWord = new HashSet<>();
+		keyWord = new HashSet<>();
+		TableGet();
 		generaterStringReg();
 		generaterMatchesReg();
 		//获取整个正则表达式
@@ -73,28 +83,25 @@ public class RexPlay {
 		}
 
 		splitString = splitString(sp);
-		matchesprefixAndsuffixKeyWord(splitString,allRegex_KeyWord,matches_keyword_regex,vc_KeyWord);
-		matchesprefixAndsuffixKeyWord(splitString, allRegex_Type,matches_type_regex,vc_Type);
+		matchesprefixAndsuffixKeyWord(splitString,allRegex,matches_regex,vc_token);
 		
-		for(int k = 0;k < vc_KeyWord.size();k++){
-			Token token = vc_KeyWord.get(k);
+		for(int k = 0;k < vc_token.size();k++){
+			Token token = vc_token.get(k);
 			token.setLocation(token.getAbsLocation() + token.getStartPosition());
 //			System.out.println(token.getValue() + "  " + "Location:" 
 //					+ token.getLocation() +  " AbsLocation:" + token.getAbsLocation() + 
 //					"  end:" + (token.getAbsLocation() + token.getStartPosition() + token.getLength())
 //					+ " length:" + token.getLength());
 		}
-		for (int k = 0; k < vc_Type.size(); k++) {
-			Token token = vc_Type.get(k);
-			System.out.println(token.getValue());
-			token.setLocation(token.getAbsLocation() + token.getStartPosition());
-		}
 	}
-	public Vector<Token> getKeyWordToken() {
-		return vc_KeyWord;
+	public HashSet<String> getKeyWord() {
+		return (HashSet<String>) keyWord;
 	}
-	public Vector<Token> getTypeToken() {
-		return vc_Type;
+	public HashSet<String> getTypeWord() {
+		return (HashSet<String>) typeWord;
+	}
+	public Vector<Token> getToken() {
+		return vc_token;
 	}
 	//数出绝对位置
 	public void countingAbsLocation(String textLine,String[] line) {
@@ -226,6 +233,7 @@ public class RexPlay {
 				matches_type_regex = matches_type_regex + "|" + KeyWord.Type_C[i];
 			}
 		}
+		matches_regex = matches_keyword_regex + "|" + matches_type_regex;
 	}
 	public void getAllRegex_C() {
 		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
@@ -241,6 +249,15 @@ public class RexPlay {
 			}else {
 				allRegex_Type = allRegex_Type + "|" + hm_type_regex.get(KeyWord.Type_C[i]);
 			}
+		}
+		allRegex = allRegex_KeyWord + "|" + allRegex_Type;
+	}
+	public void TableGet() {
+		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
+			keyWord.add(KeyWord.KeyWord_C[i]);
+		}
+		for (int i = 0; i < KeyWord.Type_C.length; i++) {
+			typeWord.add(KeyWord.Type_C[i]);
 		}
 	}
 }

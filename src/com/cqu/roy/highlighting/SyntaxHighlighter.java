@@ -23,8 +23,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private Set<String> keywords;
 	private RexPlay rPlay;
 	private JTextPane jtp;
-	private Vector<Token> vc_KeyWord_token;
-	private Vector<Token> vc_Type_token;
+	private Vector<Token> vc_token;
 	
 	public SyntaxHighlighter(JTextPane jtp) {
 		// TODO Auto-generated constructor stub
@@ -53,16 +52,16 @@ public class SyntaxHighlighter implements DocumentListener{
 	
 	public void colouringWord(StyledDocument doc, int pos) throws BadLocationException {
 		SwingUtilities.invokeLater(new ColouringTask(doc, 0, doc.getLength(), normalStyle));
-		for(int i = 0; i < vc_KeyWord_token.size();i++){
-			Token token = vc_KeyWord_token.get(i);
+		for(int i = 0; i < vc_token.size();i++){
+			Token token = vc_token.get(i);
 //			System.out.println("value:" + token.getValue() + " start:" + token.getLocation());
 			SwingUtilities.invokeLater(new ColouringTask(doc,token.getLocation()
 					,token.getLength() ,keywordStyle));
 		}
-		for(int i = 0; i < vc_Type_token.size();i++){
-			Token token = vc_Type_token.get(i);
+		for(int i = 0; i < vc_token.size();i++){
+			Token token = vc_token.get(i);
 			SwingUtilities.invokeLater(new ColouringTask(doc, token.getLocation()
-					, token.getLength(), typeStyle));
+					, token.getLength(),typeStyle));
 		}
 	}
 	
@@ -73,8 +72,7 @@ public class SyntaxHighlighter implements DocumentListener{
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
-				vc_KeyWord_token = rPlay.getKeyWordToken();
-				vc_Type_token = rPlay.getTypeToken();
+				vc_token = rPlay.getToken();
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -94,8 +92,7 @@ public class SyntaxHighlighter implements DocumentListener{
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
-				vc_KeyWord_token = rPlay.getKeyWordToken();
-				vc_Type_token = rPlay.getTypeToken();
+				vc_token = rPlay.getToken();
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
