@@ -90,20 +90,23 @@ public class RexPlay {
 				break;
 			}
 		}
-		String[] string = splitStringBynotes(sp);
-		String notes = "//";
-		for (int i = 1; i < string.length; i++) {
-			System.out.println(string[i]);
-			notes = notes + string[i];
-		}
-		
-		splitString = splitString(string[0]);
+		String[] prestring = splitStringBynotes(sp);
 		Vector<String> vc_splitString = new Vector<>();
-		for(int i = 0; i < splitString.length;i++){
-			vc_splitString.add(splitString[i]);
+		if (prestring.length != 0) {
+			splitString = splitString(prestring[0]);
+			for(int i = 0; i < splitString.length;i++){
+				vc_splitString.add(splitString[i]);
+			}
 		}
-		vc_splitString.add(notes);
-		matchesprefixAndsuffixKeyWord(splitString,allRegex,matches_regex,vc_token);
+		if (prestring.length > 1) {
+			String notes = "//";
+			for (int i = 1; i < prestring.length; i++) {
+				System.out.println(prestring[i]);
+				notes = notes + prestring[i];
+			}
+			vc_splitString.add(notes);
+		}
+		matchesprefixAndsuffixKeyWord(vc_splitString,allRegex,matches_regex,vc_token);
 
 		for(int k = 0;k < vc_token.size();k++){
 			Token token = vc_token.get(k);
@@ -124,7 +127,7 @@ public class RexPlay {
 		return vc_token;
 	}
 	//数出绝对位置
-	public void countingAbsLocation(String textLine,String[] line) {
+	public void countingAbsLocation(String textLine,Vector<String> vc_splitString) {
 		int count_pre_su = 0;//计数能匹配第几个前缀后缀的词素
 		int count_token = 0;//计数第几个分离的串
 		for(int i = 0; i < textLine.length();){
@@ -136,29 +139,29 @@ public class RexPlay {
 					return;
 				}
 				//
-				if (line[count_token] == pre_su.get(count_pre_su)) {
+				if (vc_splitString.get(count_token) == pre_su.get(count_pre_su)) {
 					absLocation.add(i);
 					count_pre_su++;
 				}
-				i = line[count_token].length() + i;
+				i = vc_splitString.get(count_token).length() + i;
 				count_token++;
 			}
 		}
 	}
 	//红色字体
 	//匹配带前缀后缀的关键词
-	public void matchesprefixAndsuffixKeyWord(String[] line,String allRegex
+	public void matchesprefixAndsuffixKeyWord(Vector<String> vc_splitString,String allRegex
 			,String matchRegex,Vector<Token> vc) {
 		//if匹配的时候与A-Z a-z 0-9中间至少夹着一个特殊字符
 		
 		Pattern pattern = Pattern.compile(allRegex);
-		for(int j = 0; j < line.length;j++){
-			Matcher matcher = pattern.matcher(line[j]);
+		for(int j = 0; j < vc_splitString.size();j++){
+			Matcher matcher = pattern.matcher(vc_splitString.get(j));
 			if (matcher.matches()) {
-				pre_su.add(line[j]);
+				pre_su.add(vc_splitString.get(j));
 			}	
 		}
-		countingAbsLocation(textLine,splitString);
+		countingAbsLocation(textLine,vc_splitString);
 		for(int i = 0; i < pre_su.size();i++){
 			matchesKeyWord(pre_su.get(i),matchRegex,allRegex,vc);
 		}
