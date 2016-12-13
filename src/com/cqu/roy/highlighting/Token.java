@@ -7,6 +7,7 @@ public class Token {
 	private int length;//长度
 	private int absLocation;//段内偏移位置
 	private int location;//绝对位置
+	private String type;//token 的类型，关键字，类型，注释
 	
 	public Token(String value,int StartPosition,int EndPosition,int length) {
 		// TODO Auto-generated constructor stub
@@ -42,5 +43,11 @@ public class Token {
 	}
 	public int getLocation() {
 		return location;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getType() {
+		return type;
 	}
 }

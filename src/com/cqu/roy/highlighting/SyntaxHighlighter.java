@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JTextPane;
@@ -19,26 +21,35 @@ import javax.swing.text.StyledDocument;
 public class SyntaxHighlighter implements DocumentListener{
 	private Style keywordStyle;//
 	private Style normalStyle;
+	private Style notesStyle;
+	private Style StringStyle;
 	private Style typeStyle;
-	private Set<String> keywords;
+	private HashSet<String> keyWord;
+	private HashSet<String> typeWord;
 	private RexPlay rPlay;
 	private JTextPane jtp;
 	private Vector<Token> vc_token;
+	//识别注释
+	private final static String notes = "//.*";
 	
 	public SyntaxHighlighter(JTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		keywordStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
-		typeStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
-		normalStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
+		typeStyle = ((StyledDocument) jtp.getDocument()).addStyle("Type_Style", null);
+		notesStyle = ((StyledDocument) jtp.getDocument()).addStyle("NotesStyle", null);
+		normalStyle = ((StyledDocument) jtp.getDocument()).addStyle("NormalStyle", null);
 		//渲染颜色
 		StyleConstants.setForeground(keywordStyle, Color.RED);	
 		StyleConstants.setForeground(typeStyle, Color.BLUE);
+		StyleConstants.setForeground(notesStyle, Color.GRAY);
 		StyleConstants.setForeground(normalStyle, Color.BLACK);
 		
 		this.jtp = jtp;
 		
 		try {
 			rPlay = new RexPlay(jtp.getDocument().getText(0, jtp.getDocument().getLength()));
+			keyWord = rPlay.getKeyWord();
+			typeWord = rPlay.getTypeWord();
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,17 +62,28 @@ public class SyntaxHighlighter implements DocumentListener{
 	}
 	
 	public void colouringWord(StyledDocument doc, int pos) throws BadLocationException {
+		//注释识别
+		Pattern pattern = Pattern.compile(notes);
 		SwingUtilities.invokeLater(new ColouringTask(doc, 0, doc.getLength(), normalStyle));
 		for(int i = 0; i < vc_token.size();i++){
 			Token token = vc_token.get(i);
-//			System.out.println("value:" + token.getValue() + " start:" + token.getLocation());
-			SwingUtilities.invokeLater(new ColouringTask(doc,token.getLocation()
-					,token.getLength() ,keywordStyle));
-		}
-		for(int i = 0; i < vc_token.size();i++){
-			Token token = vc_token.get(i);
-			SwingUtilities.invokeLater(new ColouringTask(doc, token.getLocation()
-					, token.getLength(),typeStyle));
+			Matcher matcher = pattern.matcher(token.getValue());
+			if (typeWord.contains(token.getValue())) {
+				SwingUtilities.invokeLater(new ColouringTask(doc,token.getLocation()
+						,token.getLength() ,typeStyle));
+			}
+			else if (keyWord.contains(token.getValue())) {
+				SwingUtilities.invokeLater(new ColouringTask(doc,token.getLocation()
+						,token.getLength() ,keywordStyle));
+			}
+			else if (matcher.matches()) {
+				SwingUtilities.invokeLater(new ColouringTask(doc, token.getLocation(),
+						token.getLength(),notesStyle));
+			}
+			else {
+				SwingUtilities.invokeLater(new ColouringTask(doc, 0
+						, doc.getLength(), normalStyle));
+			}
 		}
 	}
 	
@@ -88,7 +110,6 @@ public class SyntaxHighlighter implements DocumentListener{
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
 		try {
-			// 因为删除后光标紧接着影响的单词两边, 所以长度就不需要了
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
@@ -98,7 +119,6 @@ public class SyntaxHighlighter implements DocumentListener{
 				e1.printStackTrace();
 			}
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), 0);
-//			System.out.println("remove:" + e.getOffset());
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}

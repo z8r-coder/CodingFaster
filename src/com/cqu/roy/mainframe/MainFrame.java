@@ -317,9 +317,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		//初始化hash表
 		TableDriven();
 		try {
-			map.get(e.getActionCommand()).use(jp, jsp, northjp, close_id, untitled_vc
-					, sequece_name, currentAreaName
-					, currentButton, hmTextArea, hm_name_atrr, hm_name_btn);
+			
 		} catch (NullPointerException npe) {
 			// TODO: handle exception
 			int n = JOptionPane.showConfirmDialog(null, "There are some wrong.So sorry!\n"
@@ -333,6 +331,9 @@ public class MainFrame extends JFrame implements ActionListener{
 				System.exit(0);
 			}
 		}
+		map.get(e.getActionCommand()).use(jp, jsp, northjp, close_id, untitled_vc
+				, sequece_name, currentAreaName
+				, currentButton, hmTextArea, hm_name_atrr, hm_name_btn);
 		//System.out.println(hm_name_atrr.get(currentAreaName).getSuffix());
 	}
 

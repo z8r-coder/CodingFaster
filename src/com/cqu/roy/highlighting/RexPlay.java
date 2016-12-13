@@ -1,5 +1,6 @@
 package com.cqu.roy.highlighting;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +9,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.jws.soap.SOAPBinding;
 
 import com.cqu.roy.constant.KeyWord;
 import com.cqu.roy.constant.LenthAll;
@@ -26,6 +29,12 @@ public class RexPlay {
 	private final static String prefix = ".*[^A-Za-z0-9]+";
 	//匹配关键字的后缀
 	private final static String suffix = "[^A-Za-z0-9]+.*";
+	//识别注释，带前缀
+	private final static String prenotes = ".*//.*";
+	//识别注释
+	private final static String notes = "//.*";
+	//识别带前缀字符串
+	private final static String precharacterString = "\".*\"";
 	//每个token的信息
 	private Vector<Token> vc_token;
 	//每个分离出来的词素中能够提取多少个关键词
@@ -64,7 +73,7 @@ public class RexPlay {
 		//C语言
 
 		keyWordNum = new Vector<>();
-		
+		vc_token = new Vector<>();
 		typeWord = new HashSet<>();
 		keyWord = new HashSet<>();
 		TableGet();
@@ -81,10 +90,21 @@ public class RexPlay {
 				break;
 			}
 		}
-
-		splitString = splitString(sp);
-		matchesprefixAndsuffixKeyWord(splitString,allRegex,matches_regex,vc_token);
+		String[] string = splitStringBynotes(sp);
+		String notes = "//";
+		for (int i = 1; i < string.length; i++) {
+			System.out.println(string[i]);
+			notes = notes + string[i];
+		}
 		
+		splitString = splitString(string[0]);
+		Vector<String> vc_splitString = new Vector<>();
+		for(int i = 0; i < splitString.length;i++){
+			vc_splitString.add(splitString[i]);
+		}
+		vc_splitString.add(notes);
+		matchesprefixAndsuffixKeyWord(splitString,allRegex,matches_regex,vc_token);
+
 		for(int k = 0;k < vc_token.size();k++){
 			Token token = vc_token.get(k);
 			token.setLocation(token.getAbsLocation() + token.getStartPosition());
@@ -115,6 +135,7 @@ public class RexPlay {
 				if (count_pre_su == pre_su.size()) {
 					return;
 				}
+				//
 				if (line[count_token] == pre_su.get(count_pre_su)) {
 					absLocation.add(i);
 					count_pre_su++;
@@ -140,7 +161,6 @@ public class RexPlay {
 		countingAbsLocation(textLine,splitString);
 		for(int i = 0; i < pre_su.size();i++){
 			matchesKeyWord(pre_su.get(i),matchRegex,allRegex,vc);
-			//System.out.println(pre_su.get(i));
 		}
 	}
 	//从带前缀后缀的关键词中匹配出关键词
@@ -158,6 +178,7 @@ public class RexPlay {
 		while(true){
 			Matcher matcher_pre_su = pattern_pre_su.matcher(prefixAndSuffixKeyWord);
 			Matcher matcher = pattern.matcher(prefixAndSuffixKeyWord);
+			//ifd^if会出现错误表示
 			if (matcher.find() && matcher_pre_su.matches()) {
 				if (count == 0) {
 					Token token = new Token(matcher.group(0), matcher.start()
@@ -185,11 +206,17 @@ public class RexPlay {
 		}
 	}
 
+	//以空格和换行符将单词分开
 	public String[] splitString (String str) {
 		str.trim();
 		Pattern pattern = Pattern.compile("[ ]+|[\\n]");
 		String[] temp = pattern.split(str);
-		
+		return temp;
+	}
+	//以//先将注释分开
+	public String[] splitStringBynotes(String str) {
+		Pattern pattern = Pattern.compile("//");
+		String[] temp = pattern.split(str);
 		return temp;
 	}
 	//生成每个关键字需要的正则表达式,带前缀后缀
@@ -234,6 +261,7 @@ public class RexPlay {
 			}
 		}
 		matches_regex = matches_keyword_regex + "|" + matches_type_regex;
+		matches_regex = matches_regex + "|" + notes;
 	}
 	public void getAllRegex_C() {
 		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
@@ -251,6 +279,7 @@ public class RexPlay {
 			}
 		}
 		allRegex = allRegex_KeyWord + "|" + allRegex_Type;
+		allRegex = allRegex + "|" + prenotes;
 	}
 	public void TableGet() {
 		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
