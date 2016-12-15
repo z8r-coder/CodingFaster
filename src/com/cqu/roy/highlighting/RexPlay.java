@@ -34,7 +34,7 @@ public class RexPlay {
 	//识别注释
 	private final static String notes = "//.*";
 	//识别带前缀字符串
-	private final static String precharacterString = "\".*\"";
+	private final static String precharacterString = "\".*\""; 
 	//每个token的信息
 	private Vector<Token> vc_token;
 	//每个分离出来的词素中能够提取多少个关键词
@@ -90,21 +90,17 @@ public class RexPlay {
 				break;
 			}
 		}
-		String[] prestring = splitStringBynotes(sp);
+		//notes是注释和代码的分割
+		Vector<String> notes = splitStringBynotes(sp);
 		Vector<String> vc_splitString = new Vector<>();
-		if (prestring.length != 0) {
-			splitString = splitString(prestring[0]);
+		if (notes.size() != 0) {
+			splitString = splitString(notes.get(0));
 			for(int i = 0; i < splitString.length;i++){
 				vc_splitString.add(splitString[i]);
 			}
 		}
-		if (prestring.length > 1) {
-			String notes = "//";
-			for (int i = 1; i < prestring.length; i++) {
-				System.out.println(prestring[i]);
-				notes = notes + prestring[i];
-			}
-			vc_splitString.add(notes);
+		if (notes.size() > 1) {
+			vc_splitString.add(notes.get(1));
 		}
 		matchesprefixAndsuffixKeyWord(vc_splitString,allRegex,matches_regex,vc_token);
 
@@ -216,11 +212,33 @@ public class RexPlay {
 		String[] temp = pattern.split(str);
 		return temp;
 	}
+	//先用换行符分割
+	public Vector<String> byNewLine(String str) {
+		Pattern pattern = Pattern.compile("\n");
+		String []temp = pattern.split(str);
+		Vector<String> byNewLinew = new Vector<>();
+		for (int i = 0; i < temp.length; i++) {
+			byNewLinew.add(temp[i]);
+		}
+		return byNewLinew;
+	}
 	//以//先将注释分开
-	public String[] splitStringBynotes(String str) {
+	public Vector<String> splitStringBynotes(String str) {
 		Pattern pattern = Pattern.compile("//");
-		String[] temp = pattern.split(str);
-		return temp;
+		Matcher matcher = pattern.matcher(str);
+		Vector<String> byNotes = new Vector<>();
+		if (matcher.find()) {
+			int positon = matcher.start();
+			String temp_1 = str.substring(0, positon);
+			System.out.println(temp_1);
+			byNotes.add(temp_1);
+			String temp_2 = str.substring(positon,str.length());
+			byNotes.add(temp_2);
+			System.out.println(temp_2);
+		}else {
+			byNotes.add(str);
+		}
+		return byNotes;
 	}
 	//生成每个关键字需要的正则表达式,带前缀后缀
 	public void generaterStringReg() {
