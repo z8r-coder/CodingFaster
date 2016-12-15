@@ -81,26 +81,31 @@ public class RexPlay {
 		generaterMatchesReg();
 		//获取整个正则表达式
 		getAllRegex_C();
-		//去掉字符串开头的space
-		String sp = textLine;
 		
+		String sp = textLine;
+		//去掉字符串开头的space
 		for(int i = 0; i < textLine.length();i++){
 			if (textLine.charAt(i) != ' ') {
 				sp = sp.substring(i);
 				break;
 			}
 		}
-		//notes是注释和代码的分割
-		Vector<String> notes = splitStringBynotes(sp);
+		//newLine是每行间的分割
+		Vector<String> newLine = byNewLine(sp);
+		//按照每行的顺序，依次将文本，注释放如splitString中，不能乱啦位置，否则渲染位置会出错
 		Vector<String> vc_splitString = new Vector<>();
-		if (notes.size() != 0) {
-			splitString = splitString(notes.get(0));
-			for(int i = 0; i < splitString.length;i++){
-				vc_splitString.add(splitString[i]);
+		for(int i = 0; i < newLine.size();i++){
+			//notes是注释和代码的分割
+			Vector<String> notes = splitStringBynotes(newLine.get(i));
+			if (notes.size() != 0) {
+				splitString = splitString(notes.get(0));
+				for(int j = 0; j < splitString.length;j++){
+					vc_splitString.add(splitString[j]);
+				}
 			}
-		}
-		if (notes.size() > 1) {
-			vc_splitString.add(notes.get(1));
+			if (notes.size() > 1) {
+				vc_splitString.add(notes.get(1));
+			}
 		}
 		matchesprefixAndsuffixKeyWord(vc_splitString,allRegex,matches_regex,vc_token);
 
@@ -219,6 +224,7 @@ public class RexPlay {
 		Vector<String> byNewLinew = new Vector<>();
 		for (int i = 0; i < temp.length; i++) {
 			byNewLinew.add(temp[i]);
+			System.out.println(temp[i]);
 		}
 		return byNewLinew;
 	}
@@ -230,11 +236,11 @@ public class RexPlay {
 		if (matcher.find()) {
 			int positon = matcher.start();
 			String temp_1 = str.substring(0, positon);
-			System.out.println(temp_1);
+			//System.out.println(temp_1);
 			byNotes.add(temp_1);
 			String temp_2 = str.substring(positon,str.length());
 			byNotes.add(temp_2);
-			System.out.println(temp_2);
+			//System.out.println(temp_2);
 		}else {
 			byNotes.add(str);
 		}
