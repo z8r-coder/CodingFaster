@@ -7,9 +7,11 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -58,12 +60,13 @@ public class newFile implements FileOperation{
 		jtp.setBackground(new Color(50, 50, 50));
 		//设置文本监听，当文本改变时候，进行保留字的高亮渲染
 		jtp.getDocument().addDocumentListener(new SyntaxHighlighter(jtp));
+		jtp.setBorder(null);
+		//前景色为白色
 		jtp.setCaretColor(Color.WHITE);
-//		Thread thread = new Thread(Colo)
 		textPaneStyle(jtp,"Style06");
 		JpathButton switchbtn = new JpathButton(currentAreaName,currentAreaName);
 		
-		switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT);
+		switchbtn.setSize(100, LenthAll.BUTTON_HEIGHT+ 40);
 		northjp.add(switchbtn);
 		
 		mainFrame.setCurrentButton(switchbtn);//修改当前按钮

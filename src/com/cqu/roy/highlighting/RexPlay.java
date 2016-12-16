@@ -34,7 +34,11 @@ public class RexPlay {
 	//识别注释
 	private final static String notes = "//.*";
 	//识别带前缀字符串
-	private final static String precharacterString = "\".*\""; 
+	private final static String precharacterString = "\".*\"";
+	//识别带前缀后缀的数字
+	private final static String presufInteger = "[^A-Za-z_][0-9]+[^A-Za-z_]";
+	//识别数字
+	private final static String integer = "[0-9]+";
 	//每个token的信息
 	private Vector<Token> vc_token;
 	//每个分离出来的词素中能够提取多少个关键词
@@ -287,7 +291,7 @@ public class RexPlay {
 			}
 		}
 		matches_regex = matches_keyword_regex + "|" + matches_type_regex;
-		matches_regex = matches_regex + "|" + notes;
+		matches_regex = matches_regex + "|" + notes;// + "|" + integer;
 	}
 	public void getAllRegex_C() {
 		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){
@@ -305,7 +309,7 @@ public class RexPlay {
 			}
 		}
 		allRegex = allRegex_KeyWord + "|" + allRegex_Type;
-		allRegex = allRegex + "|" + prenotes;
+		allRegex = allRegex + "|" + prenotes;// + "|" + presufInteger;
 	}
 	public void TableGet() {
 		for(int i = 0; i < KeyWord.KeyWord_C.length;i++){

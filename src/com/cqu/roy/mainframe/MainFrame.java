@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
+import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,7 @@ import java.util.Vector;
 import java.util.function.Function;
 
 import javax.sound.midi.Sequence;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -36,9 +38,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
@@ -156,6 +160,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		northjp.setSize(jp.getSize().width, 40);
 	
 		jsp = new JScrollPane();//滚轮
+		jsp.setBackground(new Color(50, 50, 50));
+		jsp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
 		/*菜单*/
 		bar = new JMenuBar();
