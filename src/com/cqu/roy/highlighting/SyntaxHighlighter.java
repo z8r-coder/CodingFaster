@@ -1,6 +1,8 @@
 package com.cqu.roy.highlighting;
 
+import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Robot;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -104,6 +106,32 @@ public class SyntaxHighlighter implements DocumentListener{
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
+		//System.out.println(e.getOffset());
+		try {
+			Robot robot = new Robot();
+			try {
+				int offset = e.getOffset();
+				String Bracket = e.getDocument().getText(offset, 1);
+				if (Bracket.equals("{")) {
+					robot.keyPress(93);//"{}"
+					robot.keyRelease(93);
+				}
+				else if (Bracket.equals("(")) {
+					robot.keyPress(48);//"()"
+					robot.keyRelease(48);
+				}
+				if (Bracket.equals("\t")) {
+				}
+				System.out.println(Bracket);
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} catch (AWTException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
 	}
 
 	@Override

@@ -224,7 +224,6 @@ public class RexPlay {
 		Vector<String> byNewLinew = new Vector<>();
 		for (int i = 0; i < temp.length; i++) {
 			byNewLinew.add(temp[i]);
-			System.out.println(temp[i]);
 		}
 		return byNewLinew;
 	}
