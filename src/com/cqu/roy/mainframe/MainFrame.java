@@ -147,9 +147,11 @@ public class MainFrame extends JFrame implements ActionListener{
 		TableDriven();
 		
 		jp = (JPanel) getContentPane();
+		jp.setBackground(new Color(38, 38, 38));
 		jp.setLayout(bLayout);
 		SwingUtilities.updateComponentTreeUI(jp);
 		northjp = new JPanel();
+		northjp.setBackground(new Color(38, 38, 38));
 		northjp.setLayout(gridLayout);
 		northjp.setSize(jp.getSize().width, 40);
 	

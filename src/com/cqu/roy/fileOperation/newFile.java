@@ -1,6 +1,7 @@
 package com.cqu.roy.fileOperation;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -53,8 +54,11 @@ public class newFile implements FileOperation{
 		sequece_name.add(currentAreaName);
 
 		JTextPane jtp = new JTextPane();
+		//背景色的设置
+		jtp.setBackground(new Color(50, 50, 50));
 		//设置文本监听，当文本改变时候，进行保留字的高亮渲染
 		jtp.getDocument().addDocumentListener(new SyntaxHighlighter(jtp));
+		jtp.setCaretColor(Color.WHITE);
 //		Thread thread = new Thread(Colo)
 		textPaneStyle(jtp,"Style06");
 		JpathButton switchbtn = new JpathButton(currentAreaName,currentAreaName);

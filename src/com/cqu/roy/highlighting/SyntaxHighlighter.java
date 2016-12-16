@@ -3,9 +3,11 @@ package com.cqu.roy.highlighting;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +27,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private Style normalStyle;
 	private Style notesStyle;
 	private Style StringStyle;
+	private Style IntegerStyle;
 	private Style typeStyle;
 	private HashSet<String> keyWord;
 	private HashSet<String> typeWord;
@@ -41,11 +44,10 @@ public class SyntaxHighlighter implements DocumentListener{
 		notesStyle = ((StyledDocument) jtp.getDocument()).addStyle("NotesStyle", null);
 		normalStyle = ((StyledDocument) jtp.getDocument()).addStyle("NormalStyle", null);
 		//渲染颜色
-		StyleConstants.setForeground(keywordStyle, Color.RED);	
-		StyleConstants.setForeground(typeStyle, Color.BLUE);
+		StyleConstants.setForeground(keywordStyle, new Color(205, 50, 120));	
+		StyleConstants.setForeground(typeStyle, new Color(72, 118, 255));
 		StyleConstants.setForeground(notesStyle, Color.GRAY);
-		StyleConstants.setForeground(normalStyle, Color.BLACK);
-		
+		StyleConstants.setForeground(normalStyle, Color.WHITE);
 		this.jtp = jtp;
 		
 		try {
@@ -117,12 +119,21 @@ public class SyntaxHighlighter implements DocumentListener{
 					robot.keyRelease(93);
 				}
 				else if (Bracket.equals("(")) {
+					//jtp.setCaretPosition(e.getOffset() - 1);
 					robot.keyPress(48);//"()"
 					robot.keyRelease(48);
 				}
+				else if (Bracket.equals("\"")) {
+					robot.keyPress(KeyEvent.VK_QUOTE);
+					robot.keyRelease(KeyEvent.VK_QUOTE); //"\""??
+				}
+//				else if (Bracket.equals("\'")) {
+//					robot.keyPress(KeyEvent.VK_QUOTE);
+//					robot.keyRelease(KeyEvent.VK_QUOTE);
+//				}
 				if (Bracket.equals("\t")) {
 				}
-				System.out.println(Bracket);
+				//System.out.println(Bracket);
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

@@ -26,9 +26,9 @@ import com.cqu.roy.fileOperation.newFile;
 public class RexPlay {
 	private String textLine;
 	//匹配关键字的前缀
-	private final static String prefix = ".*[^A-Za-z0-9]+";
+	private final static String prefix = ".*[^A-Za-z0-9_]+";
 	//匹配关键字的后缀
-	private final static String suffix = "[^A-Za-z0-9]+.*";
+	private final static String suffix = "[^A-Za-z0-9_]+.*";
 	//识别注释，带前缀
 	private final static String prenotes = ".*//.*";
 	//识别注释

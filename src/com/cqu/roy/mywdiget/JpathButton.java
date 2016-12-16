@@ -1,5 +1,7 @@
 package com.cqu.roy.mywdiget;
 
+import java.awt.Color;
+
 import javax.swing.JButton;
 
 public class JpathButton extends JButton{
@@ -8,6 +10,7 @@ public class JpathButton extends JButton{
 		// TODO Auto-generated constructor stub
 		super(text);
 		this.MapFilePath = path;
+		setSize(10, 40);
 	}
 	
 	public void setMapFilePath(String mapFilePath) {
