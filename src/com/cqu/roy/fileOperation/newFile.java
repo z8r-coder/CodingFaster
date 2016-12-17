@@ -63,6 +63,7 @@ public class newFile implements FileOperation{
 		jtp.setBorder(null);
 		//前景色为白色
 		jtp.setCaretColor(Color.WHITE);
+		jtp.setBorder(null);
 		textPaneStyle(jtp,"Style06");
 		JpathButton switchbtn = new JpathButton(currentAreaName,currentAreaName);
 		
