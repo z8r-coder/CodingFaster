@@ -10,18 +10,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
+import com.cqu.roy.mainframe.MainFrame;
+import com.cqu.roy.mywdiget.MainJpanel;
 import com.cqu.roy.mywdiget.MyFontStyle;
 import com.cqu.roy.mywdiget.MyJTextPane;
+import com.cqu.roy.mywdiget.MyLabel;
 
 public class writeAndread {
 	
 	private final static String encoding = "UTF-8";
-	
+	private int lineCount = 1;
 	public void saveTo(File file,String Content) {
 		try {
 			OutputStreamWriter osw = new OutputStreamWriter(
@@ -41,7 +47,8 @@ public class writeAndread {
 		}
 	}
 	
-	public MyJTextPane openFrom(File file,MyJTextPane jtp) {
+	public MyJTextPane openFrom(File file,MyJTextPane jtp,JPanel linePanel) {
+		MainFrame mainFrame = MainFrame.getInstance();
 		String lineText = null;
 		StyledDocument document = jtp.getStyledDocument();
 		MyFontStyle myFontStyle = new MyFontStyle(document);
@@ -57,6 +64,13 @@ public class writeAndread {
 				}
 				while((lineText = br.readLine()) != null){
 					try {
+						if (lineCount == 1) {
+							linePanel.add(new MyLabel(" 1    "));
+							lineCount++;
+						}else {
+							linePanel.add(new MyLabel(" " + lineCount));
+							lineCount++;
+						}
 						document.insertString(document.getLength(), lineText + "\n"
 								, document.getStyle("Style06"));
 					} catch (BadLocationException e) {
@@ -64,6 +78,7 @@ public class writeAndread {
 						e.printStackTrace();
 					}
 				}
+				linePanel.add(new MyLabel(" " + lineCount));
 				br.close();
 				isr.close();
 			} catch (IOException e1) {
@@ -78,5 +93,8 @@ public class writeAndread {
 			e1.printStackTrace();
 		}
 		return jtp;
+	}
+	public int getLineNum() {
+		return lineCount;
 	}
 }

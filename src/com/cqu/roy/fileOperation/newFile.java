@@ -2,19 +2,14 @@ package com.cqu.roy.fileOperation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.text.StyledDocument;
 
 import com.cqu.roy.attribute.TextAtrr;
@@ -26,13 +21,14 @@ import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyFontStyle;
 import com.cqu.roy.mywdiget.MyJTextPane;
 import com.cqu.roy.mywdiget.MyLabel;
+import com.cqu.roy.mywdiget.MainJpanel;
 
 //newFile
 public class newFile implements FileOperation{
 	MainFrame mainFrame = MainFrame.getInstance();
 	@Override
 	public void use(JPanel jp,JScrollPane jsp,JPanel northjp,Vector<Integer> close_id,Vector<Integer> untitled_vc
-			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, MyJTextPane> hmTextArea 
+			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, MainJpanel> hmTextArea 
 			,HashMap<String, TextAtrr> hm_name_atrr,HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
 		int id;
@@ -48,7 +44,7 @@ public class newFile implements FileOperation{
 		//存在前一个页面，要对前一个页面解锁
 		
 		if (currentAreaName != null) {
-			hmTextArea.get(currentAreaName).setEditable(true);
+			hmTextArea.get(currentAreaName).getTextPane().setEditable(true);
 			jsp.remove(hmTextArea.get(currentAreaName));//同时移除掉，前面一个的页面
 		}
 		currentAreaName = "untitled" + id;
@@ -57,6 +53,8 @@ public class newFile implements FileOperation{
 		hm_name_atrr.put(currentAreaName, textAtrr);
 		sequece_name.add(currentAreaName);
 
+		MainJpanel mainjp = new MainJpanel();
+		//文本域
 		MyJTextPane jtp = new MyJTextPane();
 		//背景色的设置
 		jtp.setBackground(new Color(50, 50, 50));
@@ -75,7 +73,7 @@ public class newFile implements FileOperation{
 		mainFrame.setCurrentButton(switchbtn);//修改当前按钮
 		
 		hm_name_btn.put(switchbtn.getText(), switchbtn);
-		hmTextArea.put(currentAreaName, jtp);
+		hmTextArea.put(currentAreaName, mainjp);
 		mainFrame.getCurrentButton().addActionListener(new ActionListener() {
 			
 			@Override
@@ -92,10 +90,9 @@ public class newFile implements FileOperation{
 			}
 		});
 		
-		//jsp.setViewportView(jtp);
 		
-		MainLayout mainLayout = mainFrame.getMainLayout();
-		JPanel mainjp = mainFrame.getMainPane();
+		MainLayout mainLayout = new MainLayout();
+		mainjp.setLayout(mainLayout);
 		JPanel linePanel = new JPanel();
 		BoxLayout bLayout = new BoxLayout(linePanel, BoxLayout.Y_AXIS);
 		linePanel.setBackground(new Color(50, 50, 50));
@@ -106,12 +103,12 @@ public class newFile implements FileOperation{
 		mainjp.add(jtp,BorderLayout.CENTER);
 		mainjp.add(linePanel,BorderLayout.WEST);
 		
-		mainLayout.setTextPane(jtp);
-		mainLayout.setLinePanel(linePanel);
+		mainjp.setTextPane(jtp);
+		mainjp.setLinePanel(linePanel);
 		
+		jsp.add(mainjp);
 		jsp.setViewportView(mainjp);
 		jsp.updateUI();
-		//jsp.setViewportView(mainFrame.getMainPane());
 		jp.add(jsp,BorderLayout.CENTER);
 		
 		jp.updateUI();

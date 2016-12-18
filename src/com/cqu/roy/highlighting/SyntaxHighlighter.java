@@ -28,6 +28,7 @@ import javax.swing.text.StyledDocument;
 
 import com.cqu.roy.main.main;
 import com.cqu.roy.mainframe.MainFrame;
+import com.cqu.roy.mywdiget.MainJpanel;
 import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyJTextPane;
 import com.cqu.roy.mywdiget.MyLabel;
@@ -138,14 +139,20 @@ public class SyntaxHighlighter implements DocumentListener{
 		}
 		try {
 			String newLine = e.getDocument().getText(e.getOffset(), 1);
+
 			if (newLine.equals("\n")) {
-				HashMap<String, MyJTextPane> hm_textPane = mainFrame.getHashTextPane();
-				hm_textPane.get(mainFrame.getCurrentAreaName()).line();
-				MainLayout mainLayout = mainFrame.getMainLayout();
-				JPanel linepane = mainLayout.getlinePanel();
-				MyLabel jLabel = new MyLabel(" " + hm_textPane.get(mainFrame.getCurrentAreaName()).getLine());
-				linepane.add(jLabel);
-				System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getLine());
+				HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
+				//当为空时直接return
+				if (hm_textPane.get(mainFrame.getCurrentAreaName()) == null) {
+					return;
+				}
+				hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().line();
+
+				JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
+				MyLabel jLabel = new MyLabel(" " + hm_textPane.get(mainFrame.getCurrentAreaName())
+				.getTextPane().getLine());
+				linePanel.add(jLabel);
+				System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine());
 			}
 			//System.out.println(e.getDocument().getText(e.getOffset(), 1));
 		} catch (BadLocationException e3) {
@@ -205,12 +212,11 @@ public class SyntaxHighlighter implements DocumentListener{
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
 		if (isNewLine) {
-			HashMap<String, MyJTextPane> hm_textPane = mainFrame.getHashTextPane();
-			hm_textPane.get(mainFrame.getCurrentAreaName()).back();
-			MainLayout mainLayout = mainFrame.getMainLayout();
-			JPanel linepane = mainLayout.getlinePanel();
+			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
+			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();
+			JPanel linepane = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 			linepane.remove(0);
-			System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getLine());
+			System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine());
 		}
 		if (e.getOffset() > 0) {
 			try {

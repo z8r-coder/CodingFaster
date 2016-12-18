@@ -18,7 +18,7 @@ import com.cqu.roy.constant.LenthAll;
 
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
-import com.cqu.roy.mywdiget.MyJTextPane;
+import com.cqu.roy.mywdiget.MainJpanel;
 import com.cqu.roy.mywdiget.SaveDialog;
 
 public class CloseFile implements FileOperation{
@@ -29,14 +29,14 @@ public class CloseFile implements FileOperation{
 	private Icon icon = new ImageIcon("src/imageResources/warning.png");
 	private Object[] selection = {"Save","Cancle","Close Without Saving"};
 	
-	private HashMap<String, MyJTextPane> hmTextArea;
+	private HashMap<String, MainJpanel> hmTextArea;
 	private HashMap<String, JpathButton> hm_name_btn;
 	private HashMap<String, TextAtrr> hm_name_atrr;
 	
 	@Override
 	public void use(JPanel jp, JScrollPane jsp, JPanel northjp, Vector<Integer> close_id, Vector<Integer> untitled_vc,
 			Vector<String> sequece_name, String currentAreaName, JpathButton currentButton,
-			HashMap<String, MyJTextPane> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
+			HashMap<String, MainJpanel> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
 			HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
 //		System.out.println(sequece_name.size());

@@ -11,15 +11,15 @@ import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
-import com.cqu.roy.mywdiget.MyJTextPane;
+import com.cqu.roy.mywdiget.MainJpanel;
 
 public class SaveAssistant {
 	private MainFrame mainFrame = MainFrame.getInstance();
-	private HashMap<String, MyJTextPane> hmTextArea;
+	private HashMap<String, MainJpanel> hmTextArea;
 	private HashMap<String, JpathButton> hm_name_btn;
 	private HashMap<String, TextAtrr> hm_name_atrr;
 	
-	public SaveAssistant(HashMap<String, MyJTextPane> hmTextArea,HashMap<String, JpathButton> hm_name_btn
+	public SaveAssistant(HashMap<String, MainJpanel> hmTextArea,HashMap<String, JpathButton> hm_name_btn
 			,HashMap<String, TextAtrr> hm_name_atrr) {
 		// TODO Auto-generated constructor stub
 		this.hmTextArea = hmTextArea;
@@ -37,9 +37,9 @@ public class SaveAssistant {
 		textAtrr.setFileAddress(file.getPath());
 		textAtrr.setisSave(true);
 		
-		war.saveTo(file, hmTextArea.get(fileName).getText());//写入文件
+		war.saveTo(file, hmTextArea.get(fileName).getTextPane().getText());//写入文件
 		
-		MyJTextPane temp_area = hmTextArea.get(fileName);
+		MainJpanel temp_area = hmTextArea.get(fileName);
 		JpathButton temp_btn = hm_name_btn.get(fileName);
 		TextAtrr temp_atrr = hm_name_atrr.get(fileName);
 		
@@ -67,7 +67,7 @@ public class SaveAssistant {
 		hm_name_atrr.remove(name);
 		hm_name_btn.remove(name);
 	}
-	private void addMap(String name,MyJTextPane jtp,JpathButton btn,TextAtrr atrr){
+	private void addMap(String name,MainJpanel jtp,JpathButton btn,TextAtrr atrr){
 		hmTextArea.put(name, jtp);
 		hm_name_btn.put(name, btn);
 		hm_name_atrr.put(name, atrr);

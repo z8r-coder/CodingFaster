@@ -13,7 +13,7 @@ import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
-import com.cqu.roy.mywdiget.MyJTextPane;
+import com.cqu.roy.mywdiget.MainJpanel;
 
 public class SaveSingleOp implements FileOperation{
 	private writeAndread war = new writeAndread();
@@ -22,7 +22,7 @@ public class SaveSingleOp implements FileOperation{
 	@Override
 	public void use(JPanel jp, JScrollPane jsp, JPanel northjp, Vector<Integer> close_id,
 			Vector<Integer> untitled_vc, Vector<String> sequece_name, String currentAreaName, JpathButton currentButton,
-			HashMap<String, MyJTextPane> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
+			HashMap<String, MainJpanel> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
 			HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
 		if (currentAreaName == null || MainFrame.fileCount != 0) {
@@ -48,7 +48,7 @@ public class SaveSingleOp implements FileOperation{
 			/*当文件并非第一次创建的时候，已经保存过了
 			 * 会弹出选择窗口*/
 			File file = new File(textAtrr.getFileAddress());
-			war.saveTo(file, hmTextArea.get(currentAreaName).getText());
+			war.saveTo(file, hmTextArea.get(currentAreaName).getTextPane().getText());
 		}
 	}
 

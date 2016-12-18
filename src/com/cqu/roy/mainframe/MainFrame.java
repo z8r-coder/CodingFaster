@@ -48,10 +48,10 @@ import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyFontStyle;
-import com.cqu.roy.mywdiget.MyJTextPane;
+import com.cqu.roy.mywdiget.MainJpanel;
 
 public class MainFrame extends JFrame implements ActionListener{
-	private JPanel mainJP;//承载主要内容，包括文本段，行号，代码缩小等，采用复杂的GridBadLayout布局
+//	private JPanel mainJP;//承载主要内容，包括文本段，行号，代码缩小等，采用复杂的GridBadLayout布局
 	private JPanel jp;
 	private JScrollPane jsp;
 	private JMenuBar bar;
@@ -60,7 +60,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	private BorderLayout bLayout = new BorderLayout();
 	private GridLayout gridLayout = new GridLayout(1, 6);
-	private MainLayout mainlayout = new MainLayout();
+//	private MainLayout mainlayout = new MainLayout();
 	String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
 			.getAvailableFontFamilyNames();
 	
@@ -76,7 +76,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	//每次页面中发生变化，需要维护的变量
 	//名字为文件地址（由于在同一层级目录下，是没有相同名字的文件的。），若未保存，名字为untitled + id
-	private HashMap<String,MyJTextPane> hmTextArea = new HashMap<>();//名字和文本域的映射
+	private HashMap<String,MainJpanel> hmTextArea = new HashMap<>();//名字和文本域的映射
 	private HashMap<String, JpathButton> hm_name_btn = new HashMap<>();//名字和按钮的映射
 	private HashMap<String, TextAtrr> hm_name_atrr = new HashMap<>();//名字与具体对象的映射
 	private Vector<Integer> untitled_vc = new Vector<>();//未保存的id集合
@@ -139,8 +139,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		jp = (JPanel) getContentPane();
 		jp.setBackground(new Color(38, 38, 38));
 		jp.setLayout(bLayout);
-		mainJP = new JPanel();
-		mainJP.setLayout(mainlayout);
+//		mainJP = new JPanel();
+//		mainJP.setLayout(mainlayout);
 		SwingUtilities.updateComponentTreeUI(jp);
 		northjp = new JPanel();
 		northjp.setBackground(new Color(38, 38, 38));
@@ -149,10 +149,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		jsp = new JScrollPane();//滚轮
 		jsp.setBackground(new Color(50, 50, 50));
-		jsp.add(mainJP);
+		//jsp.add(mainJP);
 		jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
-		//西部使用GridBagLayout放行号与代码折叠的图标
-		westjp = new JPanel();
 		/*菜单*/
 		bar = new JMenuBar();
 		bar.setFont(new Font("粗体", Font.PLAIN, 5));
@@ -167,12 +165,12 @@ public class MainFrame extends JFrame implements ActionListener{
 			public void eventDispatched(AWTEvent event) {
 				// TODO Auto-generated method stub
 				TableDriven();
-				MyJTextPane currentArea = hmTextArea.get(currentAreaName);
+				MainJpanel currentArea = hmTextArea.get(currentAreaName);
 				if (((KeyEvent)event).getID() == KeyEvent.KEY_PRESSED) {
 					switch (((KeyEvent)event).getKeyCode()) {
 					case KeyCode.CTRL:	
 						if (currentArea != null) {
-							currentArea.setEditable(false);//锁住area
+							currentArea.getTextPane().setEditable(false);//锁住area
 						}
 						com_ctrl = true;
 						break;
@@ -239,7 +237,7 @@ public class MainFrame extends JFrame implements ActionListener{
 					switch (((KeyEvent)event).getKeyCode()) {
 					case KeyCode.CTRL:
 						if (currentArea != null) {
-							currentArea.setEditable(true);//解锁area
+							currentArea.getTextPane().setEditable(true);//解锁area
 						}
 						com_ctrl = false;
 						break;
@@ -279,19 +277,19 @@ public class MainFrame extends JFrame implements ActionListener{
 		return westjp;
 	}
 	//获取main的布局
-	public MainLayout getMainLayout() {
-		return mainlayout;
-	}
+//	public MainLayout getMainLayout() {
+//		return mainlayout;
+//	}
 	public String getCurrentAreaName() {
 		return currentAreaName;
 	}
-	public JPanel getMainPane() {
-		return mainJP;
-	}
+//	public JPanel getMainPane() {
+//		return mainJP;
+//	}
 	public JpathButton getCurrentButton() {
 		return currentButton;
 	}
-	public HashMap<String, MyJTextPane> getHashTextPane() {
+	public HashMap<String, MainJpanel> getHashTextPane() {
 		return hmTextArea;
 	}
 	public void setCurrentAreaName(String currentAreaName){

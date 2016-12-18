@@ -79,6 +79,9 @@ public class MyJTextPane extends JTextPane implements MouseListener{
     public int getLine() {
 		return line;
 	}
+    public void setLine(int lineNum) {
+		this.line = lineNum;
+	}
     public MyJPopupMenu getPop() {  
      return pop;  
     }  
