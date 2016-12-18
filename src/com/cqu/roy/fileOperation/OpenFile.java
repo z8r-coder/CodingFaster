@@ -11,6 +11,7 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.attribute.writeAndread;

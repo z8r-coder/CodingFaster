@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -22,7 +23,12 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import com.cqu.roy.main.main;
+import com.cqu.roy.mainframe.MainFrame;
+import com.cqu.roy.mywdiget.MyJTextPane;
+
 public class SyntaxHighlighter implements DocumentListener{
+	private MainFrame mainFrame;
 	private Style keywordStyle;//
 	private Style normalStyle;
 	private Style notesStyle;
@@ -41,6 +47,8 @@ public class SyntaxHighlighter implements DocumentListener{
 	
 	public SyntaxHighlighter(JTextPane jtp) {
 		// TODO Auto-generated constructor stub
+		mainFrame = MainFrame.getInstance();
+		
 		keywordStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
 		typeStyle = ((StyledDocument) jtp.getDocument()).addStyle("Type_Style", null);
 		notesStyle = ((StyledDocument) jtp.getDocument()).addStyle("NotesStyle", null);
@@ -122,7 +130,18 @@ public class SyntaxHighlighter implements DocumentListener{
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
-		//System.out.println(e.getOffset());
+		try {
+			String newLine = e.getDocument().getText(e.getOffset(), 1);
+			if (newLine.equals("\n")) {
+				HashMap<String, MyJTextPane> hm_textPane = mainFrame.getHashTextPane();
+				hm_textPane.get(mainFrame.getCurrentAreaName()).line();
+				System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getLine());
+			}
+			//System.out.println(e.getDocument().getText(e.getOffset(), 1));
+		} catch (BadLocationException e3) {
+			// TODO Auto-generated catch block
+			e3.printStackTrace();
+		}
 		try {
 			Robot robot = new Robot();
 			try {

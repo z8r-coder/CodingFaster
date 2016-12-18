@@ -2,19 +2,16 @@ package com.cqu.roy.fileOperation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.text.StyledDocument;
 
 import com.cqu.roy.attribute.TextAtrr;
@@ -90,7 +87,6 @@ public class newFile implements FileOperation{
 			}
 		});
 		
-		jsp.add(jtp);
 		jsp.setViewportView(jtp);
 		jp.add(jsp,BorderLayout.CENTER);
 		

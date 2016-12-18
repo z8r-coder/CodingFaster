@@ -292,6 +292,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	public JpathButton getCurrentButton() {
 		return currentButton;
 	}
+	public HashMap<String, MyJTextPane> getHashTextPane() {
+		return hmTextArea;
+	}
 	public void setCurrentAreaName(String currentAreaName){
 		this.currentAreaName = currentAreaName;
 	}

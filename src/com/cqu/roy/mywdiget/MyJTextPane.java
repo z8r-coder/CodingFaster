@@ -11,15 +11,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 
 public class MyJTextPane extends JTextPane implements MouseListener{
    // private static final long serialVersionUID = -2308615404205560110L;  
-    private JPopupMenu pop = null; // 弹出菜单  
-    private JMenuItem copy = null, paste = null, cut = null; // 三个功能菜单  
+    private MyJPopupMenu pop = null; // 弹出菜单  
+    private MyJMenuItem copy = null, paste = null, cut = null; // 三个功能菜单  
+    private int line = 1;
    
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
@@ -29,10 +28,10 @@ public class MyJTextPane extends JTextPane implements MouseListener{
    
     private void init() {  
 	     this.addMouseListener(this);  
-	     pop = new JPopupMenu();  
-	     pop.add(copy = new JMenuItem("复制"));  
-	     pop.add(paste = new JMenuItem("粘贴"));  
-	     pop.add(cut = new JMenuItem("剪切"));  
+	     pop = new MyJPopupMenu();  
+	     pop.add(copy = new MyJMenuItem("Copy"));  
+	     pop.add(paste = new MyJMenuItem("Paste"));  
+	     pop.add(cut = new MyJMenuItem("Cut"));  
 	     copy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_MASK));  
 	     paste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_MASK));  
 	     cut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_MASK));  
@@ -70,12 +69,21 @@ public class MyJTextPane extends JTextPane implements MouseListener{
 	    	 this.cut();  
 	     }  
     }  
-   
-    public JPopupMenu getPop() {  
+    //行号维护
+    public void line() {
+		line++;
+	}
+    public void back() {
+		line--;
+	}
+    public int getLine() {
+		return line;
+	}
+    public MyJPopupMenu getPop() {  
      return pop;  
     }  
    
-    public void setPop(JPopupMenu pop) {  
+    public void setPop(MyJPopupMenu pop) {  
      this.pop = pop;  
     }  
    
