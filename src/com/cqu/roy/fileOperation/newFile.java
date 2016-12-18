@@ -2,12 +2,15 @@ package com.cqu.roy.fileOperation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridBagConstraints;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -19,8 +22,10 @@ import com.cqu.roy.constant.LenthAll;
 import com.cqu.roy.highlighting.SyntaxHighlighter;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
+import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyFontStyle;
 import com.cqu.roy.mywdiget.MyJTextPane;
+import com.cqu.roy.mywdiget.MyLabel;
 
 //newFile
 public class newFile implements FileOperation{
@@ -87,7 +92,26 @@ public class newFile implements FileOperation{
 			}
 		});
 		
-		jsp.setViewportView(jtp);
+		//jsp.setViewportView(jtp);
+		
+		MainLayout mainLayout = mainFrame.getMainLayout();
+		JPanel mainjp = mainFrame.getMainPane();
+		JPanel linePanel = new JPanel();
+		BoxLayout bLayout = new BoxLayout(linePanel, BoxLayout.Y_AXIS);
+		linePanel.setBackground(new Color(50, 50, 50));
+		linePanel.setLayout(bLayout);
+		linePanel.add(new MyLabel(" 1    "));
+		
+		//设置约束位置
+		mainjp.add(jtp,BorderLayout.CENTER);
+		mainjp.add(linePanel,BorderLayout.WEST);
+		
+		mainLayout.setTextPane(jtp);
+		mainLayout.setLinePanel(linePanel);
+		
+		jsp.setViewportView(mainjp);
+		jsp.updateUI();
+		//jsp.setViewportView(mainFrame.getMainPane());
 		jp.add(jsp,BorderLayout.CENTER);
 		
 		jp.updateUI();

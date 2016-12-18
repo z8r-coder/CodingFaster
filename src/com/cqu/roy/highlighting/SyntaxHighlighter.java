@@ -2,6 +2,7 @@ package com.cqu.roy.highlighting;
 
 import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.GridBagLayout;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
@@ -13,6 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -25,7 +28,9 @@ import javax.swing.text.StyledDocument;
 
 import com.cqu.roy.main.main;
 import com.cqu.roy.mainframe.MainFrame;
+import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyJTextPane;
+import com.cqu.roy.mywdiget.MyLabel;
 
 public class SyntaxHighlighter implements DocumentListener{
 	private MainFrame mainFrame;
@@ -41,6 +46,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private JTextPane jtp;
 	private Vector<Token> vc_lan_token;
 	private Vector<Token> vc_normal_token;
+	private boolean isNewLine = false;
 	//识别注释
 	private final static String notes = "//.*";
 	private final static String Integer = "[0-9]+";
@@ -135,12 +141,29 @@ public class SyntaxHighlighter implements DocumentListener{
 			if (newLine.equals("\n")) {
 				HashMap<String, MyJTextPane> hm_textPane = mainFrame.getHashTextPane();
 				hm_textPane.get(mainFrame.getCurrentAreaName()).line();
+				MainLayout mainLayout = mainFrame.getMainLayout();
+				JPanel linepane = mainLayout.getlinePanel();
+				MyLabel jLabel = new MyLabel(" " + hm_textPane.get(mainFrame.getCurrentAreaName()).getLine());
+				linepane.add(jLabel);
 				System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getLine());
 			}
 			//System.out.println(e.getDocument().getText(e.getOffset(), 1));
 		} catch (BadLocationException e3) {
 			// TODO Auto-generated catch block
 			e3.printStackTrace();
+		}
+		if (e.getOffset() > 0) {
+			try {
+				String lookahead = e.getDocument().getText(e.getOffset() - 1, 1);
+				if (lookahead.equals("\n")) {
+					isNewLine = true;
+				}else {
+					isNewLine = false;
+				}
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		try {
 			Robot robot = new Robot();
@@ -181,6 +204,27 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
+		if (isNewLine) {
+			HashMap<String, MyJTextPane> hm_textPane = mainFrame.getHashTextPane();
+			hm_textPane.get(mainFrame.getCurrentAreaName()).back();
+			MainLayout mainLayout = mainFrame.getMainLayout();
+			JPanel linepane = mainLayout.getlinePanel();
+			linepane.remove(0);
+			System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getLine());
+		}
+		if (e.getOffset() > 0) {
+			try {
+				String lookahead = e.getDocument().getText(e.getOffset() - 1, 1);
+				if (lookahead.equals("\n")) {
+					isNewLine = true;
+				}else {
+					isNewLine = false;
+				}
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 		try {
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0

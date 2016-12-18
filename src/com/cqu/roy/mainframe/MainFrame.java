@@ -5,51 +5,34 @@ package com.cqu.roy.mainframe;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
-import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.font.TextAttribute;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
-import java.util.function.Function;
 
-import javax.sound.midi.Sequence;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.Border;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.text.Style;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.StyledEditorKit;
 
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.attribute.writeAndread;
-import com.cqu.roy.constant.ButtonMsg;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
@@ -63,11 +46,12 @@ import com.cqu.roy.fileOperation.SaveAs;
 import com.cqu.roy.fileOperation.SaveSingleOp;
 import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.mywdiget.JpathButton;
+import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyFontStyle;
 import com.cqu.roy.mywdiget.MyJTextPane;
-import com.cqu.roy.mywdiget.SaveDialog;
 
 public class MainFrame extends JFrame implements ActionListener{
+	private JPanel mainJP;//承载主要内容，包括文本段，行号，代码缩小等，采用复杂的GridBadLayout布局
 	private JPanel jp;
 	private JScrollPane jsp;
 	private JMenuBar bar;
@@ -76,11 +60,12 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	private BorderLayout bLayout = new BorderLayout();
 	private GridLayout gridLayout = new GridLayout(1, 6);
-	
+	private MainLayout mainlayout = new MainLayout();
 	String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
 			.getAvailableFontFamilyNames();
 	
 	private JPanel northjp;
+	private JPanel westjp;
 	
 	private MyFontStyle myFontStyle;//字体样式
 	
@@ -154,16 +139,20 @@ public class MainFrame extends JFrame implements ActionListener{
 		jp = (JPanel) getContentPane();
 		jp.setBackground(new Color(38, 38, 38));
 		jp.setLayout(bLayout);
+		mainJP = new JPanel();
+		mainJP.setLayout(mainlayout);
 		SwingUtilities.updateComponentTreeUI(jp);
 		northjp = new JPanel();
 		northjp.setBackground(new Color(38, 38, 38));
 		northjp.setLayout(gridLayout);
 		northjp.setSize(jp.getSize().width, 40);
-	
+		
 		jsp = new JScrollPane();//滚轮
 		jsp.setBackground(new Color(50, 50, 50));
-		jsp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		jsp.add(mainJP);
 		jp.add(northjp, BorderLayout.NORTH);//北部中套用另一个布局管理器
+		//西部使用GridBagLayout放行号与代码折叠的图标
+		westjp = new JPanel();
 		/*菜单*/
 		bar = new JMenuBar();
 		bar.setFont(new Font("粗体", Font.PLAIN, 5));
@@ -285,10 +274,20 @@ public class MainFrame extends JFrame implements ActionListener{
 	public static MainFrame getInstance() {
 		return mFrame;
 	}
+	//获取行号显示面板
+	public JPanel getLinePanel() {
+		return westjp;
+	}
+	//获取main的布局
+	public MainLayout getMainLayout() {
+		return mainlayout;
+	}
 	public String getCurrentAreaName() {
 		return currentAreaName;
 	}
-	
+	public JPanel getMainPane() {
+		return mainJP;
+	}
 	public JpathButton getCurrentButton() {
 		return currentButton;
 	}
