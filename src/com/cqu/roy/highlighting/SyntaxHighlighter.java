@@ -33,7 +33,8 @@ public class SyntaxHighlighter implements DocumentListener{
 	private HashSet<String> typeWord;
 	private RexPlay rPlay;
 	private JTextPane jtp;
-	private Vector<Token> vc_token;
+	private Vector<Token> vc_lan_token;
+	private Vector<Token> vc_normal_token;
 	//识别注释
 	private final static String notes = "//.*";
 	private final static String Integer = "[0-9]+";
@@ -47,9 +48,9 @@ public class SyntaxHighlighter implements DocumentListener{
 		normalStyle = ((StyledDocument) jtp.getDocument()).addStyle("NormalStyle", null);
 		//渲染颜色
 		StyleConstants.setForeground(keywordStyle, new Color(205, 50, 120));	
-		StyleConstants.setForeground(typeStyle, new Color(72, 118, 255));
+		StyleConstants.setForeground(typeStyle, new Color(175, 238, 238));
 		StyleConstants.setForeground(notesStyle, Color.GRAY);
-		StyleConstants.setForeground(IntegerStyle, new Color(34, 139, 34));
+		StyleConstants.setForeground(IntegerStyle, new Color(238,221,130));
 		StyleConstants.setForeground(normalStyle, Color.WHITE);
 		this.jtp = jtp;
 		
@@ -71,16 +72,11 @@ public class SyntaxHighlighter implements DocumentListener{
 	public void colouringWord(StyledDocument doc, int pos) throws BadLocationException {
 		//注释识别
 		Pattern pattern = Pattern.compile(notes);
-		//数字识别
-		Pattern pattern_int = Pattern.compile(Integer);
 		SwingUtilities.invokeLater(new ColouringTask(doc, 0, doc.getLength(), normalStyle));
-		for(int i = 0; i < vc_token.size();i++){
-			Token token = vc_token.get(i);
+		for(int i = 0; i < vc_lan_token.size();i++){
+			Token token = vc_lan_token.get(i);
 			Matcher matcher = pattern.matcher(token.getValue());
-			Matcher matcher_int = pattern_int.matcher(token.getValue());
-			System.out.println(matcher_int.matches());
 			if (typeWord.contains(token.getValue())) {
-				System.out.println(111);
 				SwingUtilities.invokeLater(new ColouringTask(doc,token.getLocation()
 						,token.getLength() ,typeStyle));
 			}
@@ -92,15 +88,18 @@ public class SyntaxHighlighter implements DocumentListener{
 				SwingUtilities.invokeLater(new ColouringTask(doc, token.getLocation(),
 						token.getLength(),notesStyle));
 			}
-			else if (matcher_int.matches()) {
-				System.out.println(111);
-				SwingUtilities.invokeLater(new ColouringTask(doc, token.getLocation(), 
-						token.getLength(), IntegerStyle));
-			}
 			else {
-				System.out.println(222);
 				SwingUtilities.invokeLater(new ColouringTask(doc, 0
 						, doc.getLength(), normalStyle));
+			}
+		}
+		for(int i = 0; i < vc_normal_token.size();i++){
+			Token token = vc_normal_token.get(i);
+			Pattern pattern_int = Pattern.compile(Integer);
+			Matcher matcher_int = pattern_int.matcher(token.getValue());
+			if (matcher_int.matches()) {
+				SwingUtilities.invokeLater(new ColouringTask(doc, token.getLocation(), 
+						token.getLength(), IntegerStyle));
 			}
 		}
 	}
@@ -112,7 +111,8 @@ public class SyntaxHighlighter implements DocumentListener{
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
-				vc_token = rPlay.getToken();
+				vc_lan_token = rPlay.getLanToken();
+				vc_normal_token = rPlay.getNormalToken();
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -166,7 +166,8 @@ public class SyntaxHighlighter implements DocumentListener{
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
 						, jtp.getDocument().getLength()));
-				vc_token = rPlay.getToken();
+				vc_lan_token = rPlay.getLanToken();
+				vc_normal_token = rPlay.getNormalToken();
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

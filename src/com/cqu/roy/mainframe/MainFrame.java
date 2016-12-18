@@ -146,6 +146,7 @@ public class MainFrame extends JFrame implements ActionListener{
 				(int)(dim.getHeight() - LenthAll.WINDOW_HEIGHT) / 2);
 		setSize(LenthAll.WINDOW_WIDTH, LenthAll.WINDOW_HEIGHT);
 		setTitle("CodingFaster");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
 
 		//初始化hash表
 		TableDriven();
