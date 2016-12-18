@@ -12,11 +12,11 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
 import com.cqu.roy.mywdiget.MyFontStyle;
+import com.cqu.roy.mywdiget.MyJTextPane;
 
 public class writeAndread {
 	
@@ -41,7 +41,7 @@ public class writeAndread {
 		}
 	}
 	
-	public JTextPane openFrom(File file,JTextPane jtp) {
+	public MyJTextPane openFrom(File file,MyJTextPane jtp) {
 		String lineText = null;
 		StyledDocument document = jtp.getStyledDocument();
 		MyFontStyle myFontStyle = new MyFontStyle(document);

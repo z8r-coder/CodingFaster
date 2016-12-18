@@ -10,7 +10,6 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -24,13 +23,14 @@ import com.cqu.roy.highlighting.SyntaxHighlighter;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MyFontStyle;
+import com.cqu.roy.mywdiget.MyJTextPane;
 
 //newFile
 public class newFile implements FileOperation{
 	MainFrame mainFrame = MainFrame.getInstance();
 	@Override
 	public void use(JPanel jp,JScrollPane jsp,JPanel northjp,Vector<Integer> close_id,Vector<Integer> untitled_vc
-			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, JTextPane> hmTextArea 
+			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, MyJTextPane> hmTextArea 
 			,HashMap<String, TextAtrr> hm_name_atrr,HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
 		int id;
@@ -55,7 +55,7 @@ public class newFile implements FileOperation{
 		hm_name_atrr.put(currentAreaName, textAtrr);
 		sequece_name.add(currentAreaName);
 
-		JTextPane jtp = new JTextPane();
+		MyJTextPane jtp = new MyJTextPane();
 		//背景色的设置
 		jtp.setBackground(new Color(50, 50, 50));
 		//设置文本监听，当文本改变时候，进行保留字的高亮渲染
@@ -97,7 +97,7 @@ public class newFile implements FileOperation{
 		jp.updateUI();
 		northjp.updateUI();
 	}
-	private void textPaneStyle(JTextPane jtp,String StyleName){
+	private void textPaneStyle(MyJTextPane jtp,String StyleName){
 		StyledDocument styledDocument = jtp.getStyledDocument();
 		MyFontStyle myFontStyle = new MyFontStyle(styledDocument);
 		styledDocument = myFontStyle.getStyleDoc();

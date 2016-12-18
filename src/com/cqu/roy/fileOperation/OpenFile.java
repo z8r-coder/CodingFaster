@@ -11,24 +11,24 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.highlighting.SyntaxHighlighter;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
+import com.cqu.roy.mywdiget.MyJTextPane;
 
 public class OpenFile implements FileOperation{
 	private MainFrame mainFrame = MainFrame.getInstance();
 	private writeAndread war = new writeAndread();
-	private HashMap<String, JTextPane> hmTextArea;
+	private HashMap<String, MyJTextPane> hmTextArea;
 	private HashMap<String, JpathButton> hm_name_btn;
 	private HashMap<String, TextAtrr> hm_name_atrr;
 	@Override
 	public void use(JPanel jp, JScrollPane jsp, JPanel northjp, Vector<Integer> close_id, Vector<Integer> untitled_vc,
 			Vector<String> sequece_name, String currentAreaName, JpathButton currentButton,
-			HashMap<String, JTextPane> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
+			HashMap<String, MyJTextPane> hmTextArea, HashMap<String, TextAtrr> hm_name_atrr,
 			HashMap<String, JpathButton> hm_name_btn) {
 		// TODO Auto-generated method stub
 		this.hmTextArea = hmTextArea;
@@ -39,7 +39,7 @@ public class OpenFile implements FileOperation{
 			return;
 		}
 		JFileChooser jf = new JFileChooser();
-		JTextPane jtp = new JTextPane();
+		MyJTextPane jtp = new MyJTextPane();
 		//背景色的设置
 		jtp.setBackground(new Color(50, 50, 50));
 		//设置文本监听，当文本改变时候，进行保留字的高亮渲染
@@ -58,7 +58,7 @@ public class OpenFile implements FileOperation{
 			jp.updateUI();
 			File file = jf.getSelectedFile();
 			textAtrr = new TextAtrr(true, 0, file.getName(), file.getPath());
-			JTextPane finishWritenArea;
+			MyJTextPane finishWritenArea;
 			if (file.isFile() && file.exists()) {
 				if (hm_name_btn.get(file.getPath()) == null) {
 					finishWritenArea = war.openFrom(file, jtp);//写入程序,返回值为已经写入文本的pane
@@ -112,7 +112,7 @@ public class OpenFile implements FileOperation{
 			mainFrame.requestFocus();
 		}
 	}
-	private void addMap(String name,JTextPane jtp,JpathButton btn,TextAtrr atrr){
+	private void addMap(String name,MyJTextPane jtp,JpathButton btn,TextAtrr atrr){
 		hmTextArea.put(name, jtp);
 		hm_name_btn.put(name, btn);
 		hm_name_atrr.put(name, atrr);

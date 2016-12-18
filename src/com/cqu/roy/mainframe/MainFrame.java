@@ -37,7 +37,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -65,6 +64,7 @@ import com.cqu.roy.fileOperation.SaveSingleOp;
 import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MyFontStyle;
+import com.cqu.roy.mywdiget.MyJTextPane;
 import com.cqu.roy.mywdiget.SaveDialog;
 
 public class MainFrame extends JFrame implements ActionListener{
@@ -91,7 +91,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	//每次页面中发生变化，需要维护的变量
 	//名字为文件地址（由于在同一层级目录下，是没有相同名字的文件的。），若未保存，名字为untitled + id
-	private HashMap<String,JTextPane> hmTextArea = new HashMap<>();//名字和文本域的映射
+	private HashMap<String,MyJTextPane> hmTextArea = new HashMap<>();//名字和文本域的映射
 	private HashMap<String, JpathButton> hm_name_btn = new HashMap<>();//名字和按钮的映射
 	private HashMap<String, TextAtrr> hm_name_atrr = new HashMap<>();//名字与具体对象的映射
 	private Vector<Integer> untitled_vc = new Vector<>();//未保存的id集合
@@ -178,7 +178,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			public void eventDispatched(AWTEvent event) {
 				// TODO Auto-generated method stub
 				TableDriven();
-				JTextPane currentArea = hmTextArea.get(currentAreaName);
+				MyJTextPane currentArea = hmTextArea.get(currentAreaName);
 				if (((KeyEvent)event).getID() == KeyEvent.KEY_PRESSED) {
 					switch (((KeyEvent)event).getKeyCode()) {
 					case KeyCode.CTRL:	
