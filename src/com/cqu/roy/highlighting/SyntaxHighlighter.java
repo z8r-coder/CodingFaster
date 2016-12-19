@@ -154,7 +154,6 @@ public class SyntaxHighlighter implements DocumentListener{
 				linePanel.add(jLabel);
 				System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine());
 			}
-			//System.out.println(e.getDocument().getText(e.getOffset(), 1));
 		} catch (BadLocationException e3) {
 			// TODO Auto-generated catch block
 			e3.printStackTrace();
@@ -215,8 +214,9 @@ public class SyntaxHighlighter implements DocumentListener{
 			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();
 			JPanel linepane = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
-			linepane.remove(0);
-			System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine());
+			int lineCount = hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine();
+			linepane.remove(lineCount);
+			linepane.updateUI();
 		}
 		if (e.getOffset() > 0) {
 			try {
