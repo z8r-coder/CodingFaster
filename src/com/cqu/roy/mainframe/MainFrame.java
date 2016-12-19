@@ -15,6 +15,7 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -45,6 +46,9 @@ import com.cqu.roy.fileOperation.SaveAll;
 import com.cqu.roy.fileOperation.SaveAs;
 import com.cqu.roy.fileOperation.SaveSingleOp;
 import com.cqu.roy.fileOperation.newFile;
+import com.cqu.roy.historyStorage.Node;
+import com.cqu.roy.historyStorage.TextInfo;
+import com.cqu.roy.historyStorage.VersionTree;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyFontStyle;
@@ -82,6 +86,11 @@ public class MainFrame extends JFrame implements ActionListener{
 	private Vector<Integer> untitled_vc = new Vector<>();//未保存的id集合
 	private Vector<Integer> close_id = new Vector<>();//保留ID,如1234,把2关闭啦，close_id保存数字2,然后下一个new 的时候命名为2
 	private Vector<String> sequece_name = new Vector<>();//文件打开的序列;
+	
+	//版本数
+	private VersionTree vst = new VersionTree();
+	//存放当前面板text显示的节点
+	private ArrayList<Node> currentNodeSet = new ArrayList<>();
 	
 	//JFileChooser只能有一个
 	public static int fileCount = 0;
@@ -157,7 +166,9 @@ public class MainFrame extends JFrame implements ActionListener{
 		initFileMenu();
 		initEditMenu();
 		setJMenuBar(bar);
-		
+		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 1, -1, -1, null, null);
+		vst.addNode(firstNode);
+		currentNodeSet.add(firstNode);
 		/*全局键盘监听*/
 		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
 			
@@ -272,6 +283,14 @@ public class MainFrame extends JFrame implements ActionListener{
 	public static MainFrame getInstance() {
 		return mFrame;
 	}
+	public VersionTree getVersionTree() {
+		return vst;
+	}
+	
+	public ArrayList<Node> getCurrentNodeSet() {
+		return currentNodeSet;
+	}
+	
 	//获取行号显示面板
 	public JPanel getLinePanel() {
 		return westjp;
