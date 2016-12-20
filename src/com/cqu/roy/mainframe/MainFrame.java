@@ -86,11 +86,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	private Vector<Integer> untitled_vc = new Vector<>();//未保存的id集合
 	private Vector<Integer> close_id = new Vector<>();//保留ID,如1234,把2关闭啦，close_id保存数字2,然后下一个new 的时候命名为2
 	private Vector<String> sequece_name = new Vector<>();//文件打开的序列;
-	
-	//版本数
-	private VersionTree vst = new VersionTree();
-	//存放当前面板text显示的节点
-	private ArrayList<Node> currentNodeSet = new ArrayList<>();
+	//每个页面对应着相应的版本树
+	private HashMap<String, VersionTree> hm_name_versiontree = new HashMap<>();
+
 	
 	//JFileChooser只能有一个
 	public static int fileCount = 0;
@@ -167,8 +165,6 @@ public class MainFrame extends JFrame implements ActionListener{
 		initEditMenu();
 		setJMenuBar(bar);
 		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 1, -1, -1, null, null);
-		vst.addNode(firstNode);
-		currentNodeSet.add(firstNode);
 		/*全局键盘监听*/
 		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
 			
@@ -283,14 +279,10 @@ public class MainFrame extends JFrame implements ActionListener{
 	public static MainFrame getInstance() {
 		return mFrame;
 	}
-	public VersionTree getVersionTree() {
-		return vst;
+	//获取版本树
+	public HashMap<String, VersionTree> getVersionTree() {
+		return hm_name_versiontree;
 	}
-	
-	public ArrayList<Node> getCurrentNodeSet() {
-		return currentNodeSet;
-	}
-	
 	//获取行号显示面板
 	public JPanel getLinePanel() {
 		return westjp;

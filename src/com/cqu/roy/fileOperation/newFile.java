@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -15,6 +16,9 @@ import javax.swing.text.StyledDocument;
 import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.constant.LenthAll;
 import com.cqu.roy.highlighting.SyntaxHighlighter;
+import com.cqu.roy.historyStorage.Node;
+import com.cqu.roy.historyStorage.TextInfo;
+import com.cqu.roy.historyStorage.VersionTree;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MainLayout;
@@ -26,6 +30,7 @@ import com.cqu.roy.mywdiget.MainJpanel;
 //newFile
 public class newFile implements FileOperation{
 	MainFrame mainFrame = MainFrame.getInstance();
+	private HashMap<String,VersionTree> hm_name_versiontree;
 	@Override
 	public void use(JPanel jp,JScrollPane jsp,JPanel northjp,Vector<Integer> close_id,Vector<Integer> untitled_vc
 			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, MainJpanel> hmTextArea 
@@ -53,6 +58,15 @@ public class newFile implements FileOperation{
 		hm_name_atrr.put(currentAreaName, textAtrr);
 		sequece_name.add(currentAreaName);
 
+		//获取版本树集合
+		hm_name_versiontree = mainFrame.getVersionTree();
+		VersionTree vst = new VersionTree();
+		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 1, -1, -1, null, null);
+		vst.addNode(firstNode);
+		ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
+		currentNodeSet.add(firstNode);
+		hm_name_versiontree.put(currentAreaName, vst);
+		
 		MainJpanel mainjp = new MainJpanel();
 		//文本域
 		MyJTextPane jtp = new MyJTextPane();
