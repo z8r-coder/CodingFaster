@@ -62,7 +62,7 @@ public class newFile implements FileOperation{
 		hm_name_versiontree = mainFrame.getVersionTree();
 		VersionTree vst = new VersionTree();
 		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 1, -1, -1, null, null);
-		vst.addNode(firstNode);
+		vst.InsertNode(0, firstNode);
 		ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
 		currentNodeSet.add(firstNode);
 		hm_name_versiontree.put(currentAreaName, vst);

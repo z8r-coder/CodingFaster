@@ -13,21 +13,26 @@ import java.io.IOException;
 
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
 
-public class MyJTextPane extends JTextPane implements MouseListener{
+public class MyJTextPane extends JTextPane implements MouseListener,CaretListener{
    // private static final long serialVersionUID = -2308615404205560110L;  
     private MyJPopupMenu pop = null; // 弹出菜单  
     private MyJMenuItem copy = null, paste = null, cut = null; // 三个功能菜单  
     private int line = 1;
+    private int caretLineNum = 0;
    
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
-        init();  
+        init();
 	}
    
     private void init() {  
 	     this.addMouseListener(this);  
+	     this.addCaretListener(this);
 	     pop = new MyJPopupMenu();  
 	     pop.add(copy = new MyJMenuItem("Copy"));  
 	     pop.add(paste = new MyJMenuItem("Paste"));  
@@ -121,8 +126,16 @@ public class MyJTextPane extends JTextPane implements MouseListener{
 	      iscancopy = true;  
 	     return iscancopy;  
     }  
-   
-    public void mouseClicked(MouseEvent e) {  
+    public void setCaretLine(int CaretLine) {
+		this.caretLineNum = CaretLine;
+	}
+    
+    public int getCaretLine() {
+		return caretLineNum;
+	}
+    
+    public void mouseClicked(MouseEvent e) {
+    	
     }  
    
     public void mouseEntered(MouseEvent e) {  
@@ -141,5 +154,25 @@ public class MyJTextPane extends JTextPane implements MouseListener{
     }  
    
     public void mouseReleased(MouseEvent e) {  
-    }  
+    }
+
+	@Override
+	public void caretUpdate(CaretEvent e) {
+		// TODO Auto-generated method stub
+		//System.out.println(e.getMark());
+		caretLineNum = 0;
+			try {
+				String text = getText(0, getCaretPosition());
+				for(int i = 0; i < text.length();i++){
+					if (text.charAt(i) == '\n') {
+						caretLineNum++;
+					}
+				}
+				//System.out.println(getText(0,getCaretPosition()));
+				System.out.println(caretLineNum);
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 }

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,13 +27,17 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import com.cqu.roy.historyStorage.Node;
+import com.cqu.roy.historyStorage.TextInfo;
+import com.cqu.roy.historyStorage.VersionTree;
 import com.cqu.roy.main.main;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.MainJpanel;
 import com.cqu.roy.mywdiget.MainLayout;
 import com.cqu.roy.mywdiget.MyJTextPane;
 import com.cqu.roy.mywdiget.MyLabel;
-
+/*文本监听
+ * */
 public class SyntaxHighlighter implements DocumentListener{
 	private MainFrame mainFrame;
 	private Style keywordStyle;//
@@ -43,6 +48,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private Style typeStyle;
 	private HashSet<String> keyWord;
 	private HashSet<String> typeWord;
+	private HashMap<String, VersionTree> hm_name_versiontree;
 	private RexPlay rPlay;
 	private JTextPane jtp;
 	private Vector<Token> vc_lan_token;
@@ -55,6 +61,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	public SyntaxHighlighter(JTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
+		hm_name_versiontree = mainFrame.getVersionTree();
 		
 		keywordStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
 		typeStyle = ((StyledDocument) jtp.getDocument()).addStyle("Type_Style", null);
@@ -138,21 +145,30 @@ public class SyntaxHighlighter implements DocumentListener{
 			e1.printStackTrace();
 		}
 		try {
+			//当前输入一个字符
 			String newLine = e.getDocument().getText(e.getOffset(), 1);
-
+			//获取当前节点集合
+			VersionTree vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
+			ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
+			
 			if (newLine.equals("\n")) {
+				
 				HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 				//当为空时直接return
 				if (hm_textPane.get(mainFrame.getCurrentAreaName()) == null) {
 					return;
 				}
+				
 				hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().line();
-
+				//光标的行号
+				int caretLine = hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getCaretLine();
+//				TextInfo textInfo = new TextInfo(text, startPosition, endPosition, length)
+//				vst.InsertNode(caretLine, new Node(textInfo, lineNumber, nextLineCount, previousLineCount, parentNode, SubNode));
 				JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 				MyLabel jLabel = new MyLabel(" " + hm_textPane.get(mainFrame.getCurrentAreaName())
 				.getTextPane().getLine());
 				linePanel.add(jLabel);
-				System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine());
+				//System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine());
 			}
 		} catch (BadLocationException e3) {
 			// TODO Auto-generated catch block
