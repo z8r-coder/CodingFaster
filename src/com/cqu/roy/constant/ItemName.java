@@ -11,4 +11,8 @@ public interface ItemName {
 			"Close File                              " + "Ctrl+W",
 			"Close All files",
 	};
+	String[] editOpName = {
+			"Redo                                " + "Ctrl+Y",
+			"Undo                                " + "Ctrl+Y"
+	};
 }

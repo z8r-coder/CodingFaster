@@ -37,6 +37,8 @@ import com.cqu.roy.attribute.writeAndread;
 import com.cqu.roy.constant.ItemName;
 import com.cqu.roy.constant.KeyCode;
 import com.cqu.roy.constant.LenthAll;
+import com.cqu.roy.editOperation.Redo;
+import com.cqu.roy.editOperation.Undo;
 import com.cqu.roy.fileOperation.CloseAllFile;
 import com.cqu.roy.fileOperation.CloseFile;
 import com.cqu.roy.fileOperation.CloseWindow;
@@ -310,8 +312,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	public void setCurrentButton(JpathButton currentButton) {
 		this.currentButton = currentButton;
 	}
-	private void initFileMenu(){
-		
+	private void initFileMenu(){		
 		Filemenu = new JMenu("File");
 		Filemenu.setFont(new Font("黑体", Font.PLAIN,15));
 		for(int i = 0; i < ItemName.selectionName.length;i++){
@@ -323,11 +324,12 @@ public class MainFrame extends JFrame implements ActionListener{
 	}
 	
 	private void initEditMenu(){
-		String []selectionName = {
-			"Undo","Redo","Undo selection"
-		};
-		
 		Editmenu = new JMenu("Edit");
+		for(int i = 0;i < ItemName.editOpName.length;i++){
+			JMenuItem item = new JMenuItem(ItemName.editOpName[i]);
+			item.addActionListener(this);
+			Editmenu.add(item);
+		}
 		bar.add(Editmenu);
 	}
 
@@ -366,5 +368,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		map.put(ItemName.selectionName[5], new CloseWindow());
 		map.put(ItemName.selectionName[6], new CloseFile());
 		map.put(ItemName.selectionName[7], new CloseAllFile());
+		map.put(ItemName.editOpName[0], new Redo());
+		map.put(ItemName.editOpName[1], new Undo());
 	}
 }
