@@ -61,11 +61,18 @@ public class newFile implements FileOperation{
 		//获取版本树集合
 		hm_name_versiontree = mainFrame.getVersionTree();
 		VersionTree vst = new VersionTree();
+		/*Node的参数：
+		 * 1:存储的具体内容
+		 * 2：存储的行号位置
+		 * 3：下一个操作的行号，若下一个节点不存在，则为-1
+		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1
+		 * 5：指向父节点的指针
+		 * 6：指向子节点的指针*/
 		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 1, -1, -1, null, null);
-		vst.InsertNode(0, firstNode);
+		vst.InsertNode(0, firstNode);//第一代子节点
 		ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
-		currentNodeSet.add(firstNode);
-		hm_name_versiontree.put(currentAreaName, vst);
+		currentNodeSet.add(firstNode);//当前字节点
+		hm_name_versiontree.put(currentAreaName, vst);//将其置入版本树的集合
 		
 		MainJpanel mainjp = new MainJpanel();
 		//文本域

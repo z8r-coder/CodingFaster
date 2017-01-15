@@ -365,7 +365,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		map.put(ItemName.selectionName[2], new SaveSingleOp());
 		map.put(ItemName.selectionName[3], new SaveAs());
 		map.put(ItemName.selectionName[4], new SaveAll());
-		map.put(ItemName.selectionName[5], new CloseWindow());
+		map.put(ItemName.selectionName[5], new CloseWindow()); 
 		map.put(ItemName.selectionName[6], new CloseFile());
 		map.put(ItemName.selectionName[7], new CloseAllFile());
 		map.put(ItemName.editOpName[0], new Redo());

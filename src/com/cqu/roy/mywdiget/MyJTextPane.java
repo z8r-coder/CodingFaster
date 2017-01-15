@@ -169,7 +169,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 					}
 				}
 				//System.out.println(getText(0,getCaretPosition()));
-				System.out.println(caretLineNum);
+				//System.out.println(caretLineNum);
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -50,7 +49,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private HashSet<String> typeWord;
 	private HashMap<String, VersionTree> hm_name_versiontree;
 	private RexPlay rPlay;
-	private JTextPane jtp;
+	private MyJTextPane jtp;
 	private Vector<Token> vc_lan_token;
 	private Vector<Token> vc_normal_token;
 	private boolean isNewLine = false;
@@ -58,7 +57,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private final static String notes = "//.*";
 	private final static String Integer = "[0-9]+";
 	
-	public SyntaxHighlighter(JTextPane jtp) {
+	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
 		hm_name_versiontree = mainFrame.getVersionTree();
@@ -126,6 +125,42 @@ public class SyntaxHighlighter implements DocumentListener{
 		}
 	}
 	
+	private void getCurrentLineText(int caretPosition,String newChar){
+		int caretLineNum = jtp.getCaretPosition();
+		int preahead = caretLineNum;//向前探测换行符
+		int lookahead = caretLineNum;//向后探测换行符
+		String text = jtp.getText();
+		if (newChar.equals("\n")) {
+			++lookahead;
+			if (lookahead < text.length()) {
+				if (text.charAt(lookahead) == '\n') {
+					--lookahead;
+				}
+			}
+		}
+		while(text.charAt(preahead) != '\n'){
+			preahead--;
+			if (preahead == -1) {
+				break;
+			}
+		};
+		while(text.charAt(lookahead) != '\n'){
+			lookahead++;
+			if (lookahead >= text.length()) {
+				break;
+			}
+		};
+		if (preahead == -1) {
+			preahead++;
+		}
+		try {
+			System.out.println(jtp.getText(preahead, lookahead - preahead));
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	//插入更新
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
@@ -150,7 +185,7 @@ public class SyntaxHighlighter implements DocumentListener{
 			//获取当前节点集合
 			VersionTree vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
 			ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
-			
+			//getCurrentLineText(jtp.getCaretPosition(),e.getDocument().getText(e.getOffset() - 1, 1));
 			if (newLine.equals("\n")) {
 				
 				HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
@@ -161,9 +196,11 @@ public class SyntaxHighlighter implements DocumentListener{
 				
 				hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().line();
 				//光标的行号
-				int caretLine = hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getCaretLine();
+				int caretLine = jtp.getCaretLine();
 //				TextInfo textInfo = new TextInfo(text, startPosition, endPosition, length)
 //				vst.InsertNode(caretLine, new Node(textInfo, lineNumber, nextLineCount, previousLineCount, parentNode, SubNode));
+				
+				//行号显示
 				JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 				MyLabel jLabel = new MyLabel(" " + hm_textPane.get(mainFrame.getCurrentAreaName())
 				.getTextPane().getLine());
@@ -222,7 +259,8 @@ public class SyntaxHighlighter implements DocumentListener{
 		}
 
 	}
-
+	
+	//删除更新
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
