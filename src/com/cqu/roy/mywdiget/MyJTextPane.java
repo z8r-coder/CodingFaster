@@ -17,13 +17,17 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 
+import com.cqu.roy.highlighting.SyntaxHighlighter;
+
 public class MyJTextPane extends JTextPane implements MouseListener,CaretListener{
    // private static final long serialVersionUID = -2308615404205560110L;  
     private MyJPopupMenu pop = null; // 弹出菜单  
     private MyJMenuItem copy = null, paste = null, cut = null; // 三个功能菜单  
     private int line = 1;
     private int caretLineNum = 0;
-    private String caretCharacter;//光标前一个字符
+    private String caretCharacter;//光标当前字符
+    private String preCharacter;//光标前一个字符
+    private boolean isChange = false;
    
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
@@ -156,18 +160,21 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
    
     public void mouseReleased(MouseEvent e) {  
     }
-    //获取光标前一个字符
+    //获取光标当前字符
     public String getcaretChar() {
 		return caretCharacter;
 	}
-    //设置光标前一个字符
+    //设置光标当前字符
     public void setCaretChar(String caretChar) {
 		this.caretCharacter = caretChar;
+	}
+    //获取光标前一个字符
+    public String getPreCaretChar() {
+		return preCharacter;
 	}
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		// TODO Auto-generated method stub
-		//System.out.println(e.getMark());
 		caretLineNum = 0;
 			try {
 				String text = getText(0, getCaretPosition());
@@ -176,9 +183,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 						caretLineNum++;
 					}
 				}
+				//preCharacter = caretCharacter;//将当前字符赋值为前一个字符，在remove更新的时候用
 				if (getCaretPosition() > 0) {
 					caretCharacter = getDocument().getText(getCaretPosition() - 1, 1);
-					//System.out.println(caretCharacter);
 				}
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block

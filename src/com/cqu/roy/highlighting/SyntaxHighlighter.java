@@ -18,10 +18,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -56,6 +60,9 @@ public class SyntaxHighlighter implements DocumentListener{
 	//识别注释
 	private final static String notes = "//.*";
 	private final static String Integer = "[0-9]+";
+	//退格后当前字符和上一个字符
+	private String curChar;
+	private String preChar;
 	
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
@@ -160,7 +167,7 @@ public class SyntaxHighlighter implements DocumentListener{
 		try {
 			content = jtp.getText(preahead,lookahead - preahead);
 			//System.out.println(jtp.getText(preahead, lookahead - preahead));
-			System.out.println(lookahead - preahead);
+			//System.out.println(lookahead - preahead);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -190,6 +197,7 @@ public class SyntaxHighlighter implements DocumentListener{
 		try {
 			//当前输入一个字符
 			String newLine = e.getDocument().getText(e.getOffset(), 1);
+			curChar = newLine;
 			//获取当前节点集合
 			VersionTree vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
 			ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
@@ -215,7 +223,6 @@ public class SyntaxHighlighter implements DocumentListener{
 				MyLabel jLabel = new MyLabel(" " + hm_textPane.get(mainFrame.getCurrentAreaName())
 				.getTextPane().getLine());
 				linePanel.add(jLabel);
-				//System.out.println(hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine());
 			}
 		} catch (BadLocationException e3) {
 			// TODO Auto-generated catch block
@@ -244,7 +251,6 @@ public class SyntaxHighlighter implements DocumentListener{
 					robot.keyRelease(93);
 				}
 				else if (Bracket.equals("(")) {
-					//jtp.setCaretPosition(e.getOffset() - 1);
 					robot.keyPress(48);//"()"
 					robot.keyRelease(48);
 				}
@@ -274,11 +280,35 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
-		//System.out.println(e.getOffset());
-		System.out.println(jtp.getCaretPosition());
-		int caretPositon = jtp.getCaretPosition();
 		
-		if (isNewLine) {
+		//int caretPositon = jtp.getCaretPosition();
+		jtp.addCaretListener(new CaretListener() {
+			//光标监听，退格键删除的那个字符为preChar;
+			//curChar预读的字符
+			@Override
+			public void caretUpdate(CaretEvent e) {
+				// TODO Auto-generated method stub
+				if (jtp.getCaretPosition() > 0) {
+					try {
+						curChar = jtp.getDocument().getText(jtp.getCaretPosition() - 1, 1);
+					} catch (BadLocationException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+
+		preChar = curChar;//将当前字符赋值为前一个字符，在remove更新的时候用
+		if (jtp.getCaretPosition() > 0) {
+			try {
+				curChar = jtp.getDocument().getText(jtp.getCaretPosition() - 1, 1);
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		if (preChar.equals("\n")) {
 			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();
 			JPanel linepane = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
@@ -318,6 +348,5 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 }
