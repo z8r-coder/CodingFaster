@@ -68,7 +68,7 @@ public class newFile implements FileOperation{
 		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1
 		 * 5：指向父节点的指针
 		 * 6：指向子节点的指针*/
-		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 1, -1, -1, null, null);
+		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 0, -1, -1, null, null);
 		vst.InsertNode(0, firstNode);//第一代子节点
 		ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
 		currentNodeSet.add(firstNode);//当前字节点

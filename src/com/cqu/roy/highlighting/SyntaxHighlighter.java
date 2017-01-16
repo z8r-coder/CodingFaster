@@ -63,7 +63,8 @@ public class SyntaxHighlighter implements DocumentListener{
 	//退格后当前字符和上一个字符
 	private String curChar;
 	private String preChar;
-	
+	private VersionTree vst;//版本树
+	private ArrayList<Node> currentNodeSet;//当前显示集合
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
@@ -81,10 +82,12 @@ public class SyntaxHighlighter implements DocumentListener{
 		StyleConstants.setForeground(IntegerStyle, new Color(238,221,130));
 		StyleConstants.setForeground(normalStyle, Color.WHITE);
 		this.jtp = jtp;
-		
+		//获取当前节点集合
+		vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
+		currentNodeSet = vst.getCurrentNodeSet();//当前显示内容集合
 		try {
 			rPlay = new RexPlay(jtp.getDocument().getText(0, jtp.getDocument().getLength()));
-			keyWord = rPlay.getKeyWord();
+			keyWord = rPlay.getKeyWord();			//获取当前节点集合
 			typeWord = rPlay.getTypeWord();
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -167,12 +170,17 @@ public class SyntaxHighlighter implements DocumentListener{
 		try {
 			content = jtp.getText(preahead,lookahead - preahead);
 			//System.out.println(jtp.getText(preahead, lookahead - preahead));
+			System.out.println(content);
 			//System.out.println(lookahead - preahead);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		/*参数含义
+		 * 1.具体内容
+		 * 2.开始位置
+		 * 3.结束位置
+		 * 4.长度*/
 		return new TextInfo(content, preahead, lookahead, lookahead - preahead);
 	}
 	//插入更新
@@ -198,14 +206,22 @@ public class SyntaxHighlighter implements DocumentListener{
 			//当前输入一个字符
 			String newLine = e.getDocument().getText(e.getOffset(), 1);
 			curChar = newLine;
-			//获取当前节点集合
-			VersionTree vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
-			ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
-			
-			TextInfo currentLineText = getCurrentLineText(jtp.getCaretPosition(),
-					e.getDocument().getText(e.getOffset(), 1));
+			//当新输入的字符是换行符的时候，执行行号显示，和版本树节点创建
 			if (newLine.equals("\n")) {
-				
+				TextInfo currentLineText = getCurrentLineText(jtp.getCaretPosition(),
+						e.getDocument().getText(e.getOffset(), 1));
+				int temp_line = jtp.getCaretLine() + 1;//光标所在行号
+				Node node = new Node(currentLineText, temp_line, -1,
+						-1, null, null);
+				vst.InsertNode(temp_line, node);
+				currentNodeSet.add(temp_line, node);
+				//在中间插入，重新设置后面的所有行号
+				for(int i = temp_line; i < currentNodeSet.size();i++){
+					currentNodeSet.get(i).setlineNum(i);
+				}
+//				for(int i = 0; i < currentNodeSet.size();i++){
+//					System.out.println(currentNodeSet.get(i).getLineNum());
+//				}
 				HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 				//当为空时直接return
 				if (hm_textPane.get(mainFrame.getCurrentAreaName()) == null) {
@@ -280,8 +296,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
-		
-		//int caretPositon = jtp.getCaretPosition();
+
 		jtp.addCaretListener(new CaretListener() {
 			//光标监听，退格键删除的那个字符为preChar;
 			//curChar预读的字符
@@ -308,7 +323,13 @@ public class SyntaxHighlighter implements DocumentListener{
 				e1.printStackTrace();
 			}
 		}
+		//当退格掉的是换行符的时候
 		if (preChar.equals("\n")) {
+			int temp_lineNum = jtp.getCaretLine();//删除掉的行
+			vst.removeNode(temp_lineNum);//将该行的第一代节点移除
+			currentNodeSet.remove(temp_lineNum);//将该行显示节点移除
+			
+			System.out.println(temp_lineNum);
 			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();
 			JPanel linepane = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();

@@ -183,10 +183,6 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 						caretLineNum++;
 					}
 				}
-				//preCharacter = caretCharacter;//将当前字符赋值为前一个字符，在remove更新的时候用
-				if (getCaretPosition() > 0) {
-					caretCharacter = getDocument().getText(getCaretPosition() - 1, 1);
-				}
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
