@@ -125,7 +125,7 @@ public class SyntaxHighlighter implements DocumentListener{
 		}
 	}
 	
-	private void getCurrentLineText(int caretPosition,String newChar){
+	private TextInfo getCurrentLineText(int caretPosition,String newChar){
 		int caretLineNum = jtp.getCaretPosition();
 		int preahead = caretLineNum;//向前探测换行符
 		int lookahead = caretLineNum;//向后探测换行符
@@ -136,6 +136,9 @@ public class SyntaxHighlighter implements DocumentListener{
 				if (text.charAt(lookahead) == '\n') {
 					--lookahead;
 				}
+			}
+			else if (lookahead >= text.length()) {
+				--lookahead;
 			}
 		}
 		while(text.charAt(preahead) != '\n'){
@@ -153,12 +156,17 @@ public class SyntaxHighlighter implements DocumentListener{
 		if (preahead == -1) {
 			preahead++;
 		}
+		String content = null;
 		try {
-			System.out.println(jtp.getText(preahead, lookahead - preahead));
+			content = jtp.getText(preahead,lookahead - preahead);
+			//System.out.println(jtp.getText(preahead, lookahead - preahead));
+			System.out.println(lookahead - preahead);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		return new TextInfo(content, preahead, lookahead, lookahead - preahead);
 	}
 	//插入更新
 	@Override
@@ -185,7 +193,9 @@ public class SyntaxHighlighter implements DocumentListener{
 			//获取当前节点集合
 			VersionTree vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
 			ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
-			//getCurrentLineText(jtp.getCaretPosition(),e.getDocument().getText(e.getOffset() - 1, 1));
+			
+			TextInfo currentLineText = getCurrentLineText(jtp.getCaretPosition(),
+					e.getDocument().getText(e.getOffset(), 1));
 			if (newLine.equals("\n")) {
 				
 				HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
@@ -264,6 +274,10 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
+		//System.out.println(e.getOffset());
+		System.out.println(jtp.getCaretPosition());
+		int caretPositon = jtp.getCaretPosition();
+		
 		if (isNewLine) {
 			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();

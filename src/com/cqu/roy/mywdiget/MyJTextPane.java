@@ -23,6 +23,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private MyJMenuItem copy = null, paste = null, cut = null; // 三个功能菜单  
     private int line = 1;
     private int caretLineNum = 0;
+    private String caretCharacter;//光标前一个字符
    
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
@@ -155,7 +156,14 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
    
     public void mouseReleased(MouseEvent e) {  
     }
-
+    //获取光标前一个字符
+    public String getcaretChar() {
+		return caretCharacter;
+	}
+    //设置光标前一个字符
+    public void setCaretChar(String caretChar) {
+		this.caretCharacter = caretChar;
+	}
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		// TODO Auto-generated method stub
@@ -168,8 +176,10 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 						caretLineNum++;
 					}
 				}
-				//System.out.println(getText(0,getCaretPosition()));
-				//System.out.println(caretLineNum);
+				if (getCaretPosition() > 0) {
+					caretCharacter = getDocument().getText(getCaretPosition() - 1, 1);
+					//System.out.println(caretCharacter);
+				}
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
