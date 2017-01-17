@@ -38,14 +38,16 @@ public class TimerSchedule implements Runnable{
 		String str = null;
 		int temp = startPosition;
 		try {
-			while(jtp.getDocument().getText(temp, 1) != "\n" && temp < jtp.getDocument().getLength()){
+			while(!jtp.getDocument().getText(temp, 1).equals("\n") && temp < jtp.getDocument().getLength()){
 				temp++;
 			}
+			System.out.println(temp);
 			str = jtp.getDocument().getText(startPosition, temp - startPosition);
-		} catch (BadLocationException e) {
+		} catch (BadLocationException e) { 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//System.out.println(str);
 		return str;
 	}
 	@Override
@@ -74,7 +76,6 @@ public class TimerSchedule implements Runnable{
 				}
 			}
 			modified.clear();
-			System.out.println(modified.size());
 		}
 	}
 }

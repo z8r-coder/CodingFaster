@@ -175,9 +175,6 @@ public class SyntaxHighlighter implements DocumentListener{
 		String content = null;
 		try {
 			content = jtp.getText(preahead,lookahead - preahead);
-			//System.out.println(jtp.getText(preahead, lookahead - preahead));
-			System.out.println(content);
-			//System.out.println(lookahead - preahead);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -205,7 +202,6 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
-		modifiedLine.add(jtp.getCaretLine());
 		try {
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
@@ -225,6 +221,27 @@ public class SyntaxHighlighter implements DocumentListener{
 			//当前输入一个字符
 			String newLine = e.getDocument().getText(e.getOffset(), 1);
 			curChar = newLine;
+			int caretLine;
+			//若输入是换行符，则行号加一则正确
+			if (newLine.equals("\n")) {
+				caretLine = jtp.getCaretLine() + 1;
+			}else {
+				caretLine = jtp.getCaretLine();
+			}
+
+			modifiedLine.add(caretLine);
+			//System.out.println(caretLine);
+			//每次修改的时候会产生新的版本节点，使用光标的位置更新其startPosition
+			TextInfo lineText = getCurrentLineText(jtp.getCaretPosition(), 
+					e.getDocument().getText(e.getOffset(), 1));
+			int startPosition = lineText.getStartPostion();
+			//System.out.println(startPosition);
+			int lineNum = jtp.getCaretLine();
+			if (lineNum < currentNodeSet.size()) {
+				Node node = currentNodeSet.get(lineNum);
+				node.getText().setStartPosition(startPosition);
+			}
+					
 			//当新输入的字符是换行符的时候，执行行号显示，和版本树节点创建
 			if (newLine.equals("\n")) {
 				TextInfo currentLineText = getCurrentLineText(jtp.getCaretPosition(),
@@ -248,8 +265,6 @@ public class SyntaxHighlighter implements DocumentListener{
 				}
 				
 				hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().line();
-				//光标的行号
-				int caretLine = jtp.getCaretLine();
 				
 				//行号显示
 				JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
