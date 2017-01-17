@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
@@ -65,6 +67,8 @@ public class SyntaxHighlighter implements DocumentListener{
 	private String preChar;
 	private VersionTree vst;//版本树
 	private ArrayList<Node> currentNodeSet;//当前显示集合
+	private Thread timer;
+	private HashSet<Integer> modifiedLine;//修改过的行
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
@@ -85,6 +89,9 @@ public class SyntaxHighlighter implements DocumentListener{
 		//获取当前节点集合
 		vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
 		currentNodeSet = vst.getCurrentNodeSet();//当前显示内容集合
+		modifiedLine = new HashSet<>();
+		timer = new Thread(new TimerSchedule(true, jtp,modifiedLine,vst));
+		timer.start();
 		try {
 			rPlay = new RexPlay(jtp.getDocument().getText(0, jtp.getDocument().getLength()));
 			keyWord = rPlay.getKeyWord();			//获取当前节点集合
@@ -93,7 +100,6 @@ public class SyntaxHighlighter implements DocumentListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public void colouring(StyledDocument doc,int pos,int len) throws BadLocationException{
@@ -183,10 +189,23 @@ public class SyntaxHighlighter implements DocumentListener{
 		 * 4.长度*/
 		return new TextInfo(content, preahead, lookahead, lookahead - preahead);
 	}
+	private void TimerSchedule(){
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				int caretLinuNum = jtp.getCaretLine();
+				System.out.println(caretLinuNum);
+			}
+		}, 1000);
+	}
 	//插入更新
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
+		modifiedLine.add(jtp.getCaretLine());
 		try {
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
@@ -231,8 +250,6 @@ public class SyntaxHighlighter implements DocumentListener{
 				hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().line();
 				//光标的行号
 				int caretLine = jtp.getCaretLine();
-//				TextInfo textInfo = new TextInfo(text, startPosition, endPosition, length)
-//				vst.InsertNode(caretLine, new Node(textInfo, lineNumber, nextLineCount, previousLineCount, parentNode, SubNode));
 				
 				//行号显示
 				JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
@@ -289,7 +306,6 @@ public class SyntaxHighlighter implements DocumentListener{
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-
 	}
 	
 	//删除更新
