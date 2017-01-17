@@ -38,7 +38,7 @@ public class TimerSchedule implements Runnable{
 		String str = null;
 		int temp = startPosition;
 		try {
-			while(jtp.getDocument().getText(temp, 1) != "\n"){
+			while(jtp.getDocument().getText(temp, 1) != "\n" && temp < jtp.getDocument().getLength()){
 				temp++;
 			}
 			str = jtp.getDocument().getText(startPosition, temp - startPosition);
@@ -66,23 +66,15 @@ public class TimerSchedule implements Runnable{
 					
 					TextInfo textInfo = node.getText();
 					int startPostion = textInfo.getStartPostion();
-					try {
-						
-						if (currentLine == 0) {
-							System.out.println(getModifiedString(startPostion));
-							//System.out.println(jtp.getDocument().getText(startPostion, 1));
-						}else {
-							System.out.println(getModifiedString(startPostion + 1));
-							System.out.println(jtp.getDocument().getText(startPostion + 1, 1));
-						}
-						//System.out.println(jtp.getDocument().getText(startPostion, 1));
-					} catch (BadLocationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if (currentLine == 0) {
+						System.out.println(getModifiedString(startPostion));
+					}else {
+						//System.out.println(getModifiedString(startPostion + 1));
 					}
 				}
 			}
 			modified.clear();
+			System.out.println(modified.size());
 		}
 	}
 }
