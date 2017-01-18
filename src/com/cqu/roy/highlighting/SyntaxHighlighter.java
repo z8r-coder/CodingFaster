@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -186,18 +187,6 @@ public class SyntaxHighlighter implements DocumentListener{
 		 * 4.长度*/
 		return new TextInfo(content, preahead, lookahead, lookahead - preahead);
 	}
-	private void TimerSchedule(){
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				int caretLinuNum = jtp.getCaretLine();
-				System.out.println(caretLinuNum);
-			}
-		}, 1000);
-	}
 	//插入更新
 	@Override
 	public void insertUpdate(DocumentEvent e) {
@@ -235,11 +224,23 @@ public class SyntaxHighlighter implements DocumentListener{
 			TextInfo lineText = getCurrentLineText(jtp.getCaretPosition(), 
 					e.getDocument().getText(e.getOffset(), 1));
 			int startPosition = lineText.getStartPostion();
-			//System.out.println(startPosition);
+			
 			int lineNum = jtp.getCaretLine();
 			if (lineNum < currentNodeSet.size()) {
 				Node node = currentNodeSet.get(lineNum);
 				node.getText().setStartPosition(startPosition);
+			}
+			//若修改的行数在前面，后面的作出修改的行数已经不能获得更新，因此在此处进行更新
+			Iterator<Integer> iterator = modifiedLine.iterator();
+			while(iterator.hasNext()){
+				int temp_line = (int) iterator.next();
+				//若是行号在当前操作行的下面
+				if (temp_line > lineNum && temp_line < currentNodeSet.size()) {
+					TextInfo textInfo = currentNodeSet.get(temp_line).getText();
+					int curStartPos = textInfo.getStartPostion();
+					curStartPos++;
+					textInfo.setStartPosition(curStartPos);
+				}
 			}
 					
 			//当新输入的字符是换行符的时候，执行行号显示，和版本树节点创建
@@ -256,7 +257,7 @@ public class SyntaxHighlighter implements DocumentListener{
 					currentNodeSet.get(i).setlineNum(i);
 				}
 //				for(int i = 0; i < currentNodeSet.size();i++){
-//					System.out.println(currentNodeSet.get(i).getLineNum());
+//					System.out.println(currentNodeSet.get(i).getText().getText());
 //				}
 				HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 				//当为空时直接return

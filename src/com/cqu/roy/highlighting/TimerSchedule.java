@@ -52,17 +52,18 @@ public class TimerSchedule implements Runnable{
 		}
 		return str;
 	}
+	//同步存在很大的问题
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		while(true){
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Iterator iterator = modified.iterator();
+			Iterator<Integer> iterator = modified.iterator();
 			if (isModified) {
 				while(iterator.hasNext()){
 					int currentLine = (int)iterator.next();
@@ -71,12 +72,27 @@ public class TimerSchedule implements Runnable{
 					TextInfo textInfo = node.getText();
 					int startPostion = textInfo.getStartPostion();
 					if (currentLine == 0) {
-						System.out.println(getModifiedString(startPostion,currentLine));
-						
+						//产生新一代版本
+						Node parentNode = currentNode.get(currentLine);
+						String content = getModifiedString(startPostion, currentLine);
+						TextInfo textInfo2 = new TextInfo(content, startPostion, 
+								startPostion + content.length(), content.length());
+						Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
+						parentNode.setSubNode(nextNode);
+						currentNode.set(currentLine, nextNode);
 					}else {
-						System.out.println(getModifiedString(startPostion + 1,currentLine));
+						Node parentNode = currentNode.get(currentLine);
+						String content = getModifiedString(startPostion + 1, currentLine);
+						TextInfo textInfo2 = new TextInfo(content, startPostion, 
+								startPostion + content.length(), content.length());
+						Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
+						parentNode.setSubNode(nextNode);
+						currentNode.set(currentLine, nextNode);
 					}
 				}
+			}
+			for(int i = 0; i < currentNode.size();i++){
+				System.out.println(currentNode.get(i).getText().getText());
 			}
 			modified.clear();
 		}
