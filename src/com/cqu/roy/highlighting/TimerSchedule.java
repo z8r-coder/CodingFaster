@@ -34,20 +34,22 @@ public class TimerSchedule implements Runnable{
 	public void setIsModified(boolean isModified) {
 		this.isModified = isModified;
 	}
-	public String getModifiedString(int startPosition) {
+	//currentLine需要将非第一行的数据添加上换行符
+	public String getModifiedString(int startPosition,int currentLine) {
 		String str = null;
 		int temp = startPosition;
 		try {
 			while(!jtp.getDocument().getText(temp, 1).equals("\n") && temp < jtp.getDocument().getLength()){
 				temp++;
 			}
-			System.out.println(temp);
 			str = jtp.getDocument().getText(startPosition, temp - startPosition);
+			if (currentLine != 0) {
+				str = "\n" + str;
+			}
 		} catch (BadLocationException e) { 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//System.out.println(str);
 		return str;
 	}
 	@Override
@@ -69,9 +71,10 @@ public class TimerSchedule implements Runnable{
 					TextInfo textInfo = node.getText();
 					int startPostion = textInfo.getStartPostion();
 					if (currentLine == 0) {
-						System.out.println(getModifiedString(startPostion));
+						System.out.println(getModifiedString(startPostion,currentLine));
+						
 					}else {
-						//System.out.println(getModifiedString(startPostion + 1));
+						System.out.println(getModifiedString(startPostion + 1,currentLine));
 					}
 				}
 			}
