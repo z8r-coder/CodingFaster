@@ -3,11 +3,13 @@ package com.cqu.roy.highlighting;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.text.BadLocationException;
 
+import com.cqu.roy.editOperation.Undo;
 import com.cqu.roy.historyStorage.Node;
 import com.cqu.roy.historyStorage.TextInfo;
 import com.cqu.roy.historyStorage.VersionTree;
@@ -22,14 +24,18 @@ public class TimerSchedule implements Runnable{
 	private VersionTree vst;
 	private ArrayList<Node> currentNode;//显示结点
 	private int count;//计数器，
-	public TimerSchedule(boolean isModified,MyJTextPane jtp,HashSet<Integer> modified,VersionTree vst) {
+	private Stack<HashSet<Integer>> RedoStack;//Redo栈
+	private Stack<HashSet<Integer>> UndoStack;//Undo栈
+	public TimerSchedule(boolean isModified,MyJTextPane jtp,HashSet<Integer> modified) {
 		// TODO Auto-generated constructor stub
 		this.isModified = isModified;
 		this.jtp = jtp;
 		this.modified = modified;
-		this.vst = vst;
+		this.vst = jtp.getVersionTree();
 		currentNode = vst.getCurrentNodeSet();
 		count = 0;
+		RedoStack = jtp.getRedoStack();
+		UndoStack = jtp.getUndoStack();
 	}
 	public void setIsModified(boolean isModified) {
 		this.isModified = isModified;
@@ -65,35 +71,40 @@ public class TimerSchedule implements Runnable{
 			}
 			Iterator<Integer> iterator = modified.iterator();
 			if (isModified) {
-				while(iterator.hasNext()){
-					int currentLine = (int)iterator.next();
-					Node node = currentNode.get(currentLine);
-					
-					TextInfo textInfo = node.getText();
-					int startPostion = textInfo.getStartPostion();
-					if (currentLine == 0) {
-						//产生新一代版本
-						Node parentNode = currentNode.get(currentLine);
-						String content = getModifiedString(startPostion, currentLine);
-						TextInfo textInfo2 = new TextInfo(content, startPostion, 
-								startPostion + content.length(), content.length());
-						Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
-						parentNode.setSubNode(nextNode);
-						currentNode.set(currentLine, nextNode);
-					}else {
-						Node parentNode = currentNode.get(currentLine);
-						String content = getModifiedString(startPostion + 1, currentLine);
-						TextInfo textInfo2 = new TextInfo(content, startPostion, 
-								startPostion + content.length(), content.length());
-						Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
-						parentNode.setSubNode(nextNode);
-						currentNode.set(currentLine, nextNode);
+				synchronized (this) {
+					while(iterator.hasNext()){
+						int currentLine = (int)iterator.next();
+						Node node = currentNode.get(currentLine);
+						
+						TextInfo textInfo = node.getText();
+						int startPostion = textInfo.getStartPostion();
+						if (currentLine == 0) {
+							//产生新一代版本
+							Node parentNode = currentNode.get(currentLine);
+							String content = getModifiedString(startPostion, currentLine);
+							TextInfo textInfo2 = new TextInfo(content, startPostion, 
+									startPostion + content.length(), content.length());
+							Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
+							parentNode.setSubNode(nextNode);
+							currentNode.set(currentLine, nextNode);
+						}else {
+							Node parentNode = currentNode.get(currentLine);
+							String content = getModifiedString(startPostion + 1, currentLine);
+							TextInfo textInfo2 = new TextInfo(content, startPostion, 
+									startPostion + content.length(), content.length());
+							Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
+							parentNode.setSubNode(nextNode);
+							currentNode.set(currentLine, nextNode);
+						}
 					}
 				}
 			}
-			for(int i = 0; i < currentNode.size();i++){
-				System.out.println(currentNode.get(i).getText().getText());
-			}
+//			for(int i = 0; i < currentNode.size();i++){
+//				System.out.println(currentNode.get(i).getText().getText());
+//			}
+			//push操作不会进行拷贝，需自己拷贝，否则modified和stack的top将指向同一个对象
+			HashSet<Integer> temp = (HashSet<Integer>) modified.clone();
+			UndoStack.push(temp);
 			modified.clear();
 		}
 	}

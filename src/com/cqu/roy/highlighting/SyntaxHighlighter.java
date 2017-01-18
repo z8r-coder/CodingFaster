@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -54,7 +55,6 @@ public class SyntaxHighlighter implements DocumentListener{
 	private Style typeStyle;
 	private HashSet<String> keyWord;
 	private HashSet<String> typeWord;
-	private HashMap<String, VersionTree> hm_name_versiontree;
 	private RexPlay rPlay;
 	private MyJTextPane jtp;
 	private Vector<Token> vc_lan_token;
@@ -73,7 +73,6 @@ public class SyntaxHighlighter implements DocumentListener{
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
-		hm_name_versiontree = mainFrame.getVersionTree();
 		
 		keywordStyle = ((StyledDocument) jtp.getDocument()).addStyle("Keyword_Style", null);
 		typeStyle = ((StyledDocument) jtp.getDocument()).addStyle("Type_Style", null);
@@ -88,10 +87,11 @@ public class SyntaxHighlighter implements DocumentListener{
 		StyleConstants.setForeground(normalStyle, Color.WHITE);
 		this.jtp = jtp;
 		//获取当前节点集合
-		vst = hm_name_versiontree.get(mainFrame.getCurrentAreaName());
+		vst = jtp.getVersionTree();
 		currentNodeSet = vst.getCurrentNodeSet();//当前显示内容集合
 		modifiedLine = new HashSet<>();
-		timer = new Thread(new TimerSchedule(true, jtp,modifiedLine,vst));
+		TimerSchedule ts = new TimerSchedule(true, jtp, modifiedLine);
+		timer = new Thread(ts);
 		timer.start();
 		try {
 			rPlay = new RexPlay(jtp.getDocument().getText(0, jtp.getDocument().getLength()));
@@ -345,16 +345,16 @@ public class SyntaxHighlighter implements DocumentListener{
 				}
 			}
 		});
-
+		System.out.println(11);
 		preChar = curChar;//将当前字符赋值为前一个字符，在remove更新的时候用
-		if (jtp.getCaretPosition() > 0) {
 			try {
-				curChar = jtp.getDocument().getText(jtp.getCaretPosition() - 1, 1);
+				if (jtp.getCaretPosition() > 0) {
+					curChar = jtp.getDocument().getText(jtp.getCaretPosition() - 1, 1);
+				}
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		}
 		//当退格掉的是换行符的时候
 		if (preChar.equals("\n")) {
 			int temp_lineNum = jtp.getCaretLine();//删除掉的行

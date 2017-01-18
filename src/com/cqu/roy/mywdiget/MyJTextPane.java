@@ -10,6 +10,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Stack;
 
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
@@ -17,10 +20,16 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 
+import com.cqu.roy.editOperation.Undo;
+import com.cqu.roy.fileOperation.newFile;
 import com.cqu.roy.highlighting.SyntaxHighlighter;
+import com.cqu.roy.historyStorage.Node;
+import com.cqu.roy.historyStorage.TextInfo;
+import com.cqu.roy.historyStorage.VersionTree;
 
 public class MyJTextPane extends JTextPane implements MouseListener,CaretListener{
    // private static final long serialVersionUID = -2308615404205560110L;  
+	
     private MyJPopupMenu pop = null; // 弹出菜单  
     private MyJMenuItem copy = null, paste = null, cut = null; // 三个功能菜单  
     private int line = 1;
@@ -28,13 +37,38 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private String caretCharacter;//光标当前字符
     private String preCharacter;//光标前一个字符
     private boolean isChange = false;
-   
+    private VersionTree vst;//每个文本域映射一个版本树，将其封装在此类中
+    private ArrayList<Node> currentNodeSet;
+    private Stack<HashSet<Integer>> RedoStack;//每个文本域映射一个Redo栈
+    private Stack<HashSet<Integer>> UndoStack;//每个文本域映射一个Undo栈
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
         init();
+		vst = new VersionTree();
+		/*Node的参数：
+		 * 1:存储的具体内容
+		 * 2：存储的行号位置
+		 * 3：下一个操作的行号，若下一个节点不存在，则为-1
+		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1
+		 * 5：指向父节点的指针
+		 * 6：指向子节点的指针*/
+		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 0, -1, -1, null, null);
+		vst.InsertNode(0, firstNode);//第一代子节点
+		currentNodeSet = vst.getCurrentNodeSet();
+		currentNodeSet.add(firstNode);//当前字节点
+		RedoStack = new Stack<>();
+		UndoStack = new Stack<>();
 	}
-   
+    public VersionTree getVersionTree() {
+		return vst;
+	}
+    public Stack<HashSet<Integer>> getRedoStack() {
+		return RedoStack;
+	}
+    public Stack<HashSet<Integer>> getUndoStack() {
+		return UndoStack;
+	}
     private void init() {  
 	     this.addMouseListener(this);  
 	     this.addCaretListener(this);

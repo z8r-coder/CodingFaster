@@ -30,7 +30,6 @@ import com.cqu.roy.mywdiget.MainJpanel;
 //newFile
 public class newFile implements FileOperation{
 	MainFrame mainFrame = MainFrame.getInstance();
-	private HashMap<String,VersionTree> hm_name_versiontree;
 	@Override
 	public void use(JPanel jp,JScrollPane jsp,JPanel northjp,Vector<Integer> close_id,Vector<Integer> untitled_vc
 			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, MainJpanel> hmTextArea 
@@ -58,25 +57,11 @@ public class newFile implements FileOperation{
 		hm_name_atrr.put(currentAreaName, textAtrr);
 		sequece_name.add(currentAreaName);
 
-		//获取版本树集合
-		hm_name_versiontree = mainFrame.getVersionTree();
-		VersionTree vst = new VersionTree();
-		/*Node的参数：
-		 * 1:存储的具体内容
-		 * 2：存储的行号位置
-		 * 3：下一个操作的行号，若下一个节点不存在，则为-1
-		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1
-		 * 5：指向父节点的指针
-		 * 6：指向子节点的指针*/
-		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 0, -1, -1, null, null);
-		vst.InsertNode(0, firstNode);//第一代子节点
-		ArrayList<Node> currentNodeSet = vst.getCurrentNodeSet();
-		currentNodeSet.add(firstNode);//当前字节点
-		hm_name_versiontree.put(currentAreaName, vst);//将其置入版本树的集合
-		
+		//mainjp中封装着jtp
 		MainJpanel mainjp = new MainJpanel();
-		//文本域
+		//文本域,文本域中封装啦版本树和Undo,Redo栈
 		MyJTextPane jtp = new MyJTextPane();
+		mainjp.setTextPane(jtp);
 		//背景色的设置
 		jtp.setBackground(new Color(50, 50, 50));
 		//设置文本监听，当文本改变时候，进行保留字的高亮渲染
