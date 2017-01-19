@@ -84,16 +84,36 @@ public class TimerSchedule implements Runnable{
 							String content = getModifiedString(startPostion, currentLine);
 							TextInfo textInfo2 = new TextInfo(content, startPostion, 
 									startPostion + content.length(), content.length());
+							//新生成的节点
 							Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
-							parentNode.setSubNode(nextNode);
+							if (parentNode.getSubNode() != null) {
+								//若父节点还存在子节点
+								Node subNode = parentNode.getSubNode();
+								parentNode.setSubNode(nextNode);
+								nextNode.setSubNode(subNode);
+								subNode.setParentNode(nextNode);
+							}else {
+								//若父节点不存在子节点
+								parentNode.setSubNode(nextNode);
+							}
 							currentNode.set(currentLine, nextNode);
 						}else {
 							Node parentNode = currentNode.get(currentLine);
 							String content = getModifiedString(startPostion + 1, currentLine);
 							TextInfo textInfo2 = new TextInfo(content, startPostion, 
 									startPostion + content.length(), content.length());
+							//新生成的节点
 							Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
-							parentNode.setSubNode(nextNode);
+							if (parentNode.getSubNode() != null) {
+								//若父节点还存在子节点
+								Node subNode = parentNode.getSubNode();
+								parentNode.setSubNode(nextNode);
+								nextNode.setSubNode(subNode);
+								subNode.setParentNode(nextNode);
+							}else {
+								//若父节点不存在子节点
+								parentNode.setSubNode(nextNode);
+							}
 							currentNode.set(currentLine, nextNode);
 						}
 					}
