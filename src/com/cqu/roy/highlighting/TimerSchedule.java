@@ -103,8 +103,11 @@ public class TimerSchedule implements Runnable{
 //				System.out.println(currentNode.get(i).getText().getText());
 //			}
 			//push操作不会进行拷贝，需自己拷贝，否则modified和stack的top将指向同一个对象
-			HashSet<Integer> temp = (HashSet<Integer>) modified.clone();
-			UndoStack.push(temp);
+			//当存在修改操作时，才进行压栈
+			if (!modified.isEmpty()) {
+				HashSet<Integer> temp = (HashSet<Integer>) modified.clone();
+				UndoStack.push(temp);
+			}
 			modified.clear();
 		}
 	}

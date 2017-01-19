@@ -345,9 +345,10 @@ public class SyntaxHighlighter implements DocumentListener{
 				}
 			}
 		});
-		System.out.println(11);
 		preChar = curChar;//将当前字符赋值为前一个字符，在remove更新的时候用
+		System.out.println(jtp.getCaretPosition());
 			try {
+				
 				if (jtp.getCaretPosition() > 0) {
 					curChar = jtp.getDocument().getText(jtp.getCaretPosition() - 1, 1);
 				}
