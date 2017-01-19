@@ -286,6 +286,10 @@ public class MainFrame extends JFrame implements ActionListener{
 //	public MainLayout getMainLayout() {
 //		return mainlayout;
 //	}
+	//获取ctrl键的信息
+	public boolean getCtrl() {
+		return com_ctrl;
+	}
 	public String getCurrentAreaName() {
 		return currentAreaName;
 	}

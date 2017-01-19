@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,8 +28,10 @@ import com.cqu.roy.highlighting.SyntaxHighlighter;
 import com.cqu.roy.historyStorage.Node;
 import com.cqu.roy.historyStorage.TextInfo;
 import com.cqu.roy.historyStorage.VersionTree;
+import com.cqu.roy.main.main;
+import com.cqu.roy.mainframe.MainFrame;
 
-public class MyJTextPane extends JTextPane implements MouseListener,CaretListener{
+public class MyJTextPane extends JTextPane implements MouseListener,CaretListener,MouseWheelListener{
    // private static final long serialVersionUID = -2308615404205560110L;  
 	
     private MyJPopupMenu pop = null; // 弹出菜单  
@@ -41,10 +45,12 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private ArrayList<Node> currentNodeSet;
     private Stack<HashSet<Integer>> RedoStack;//每个文本域映射一个Redo栈
     private Stack<HashSet<Integer>> UndoStack;//每个文本域映射一个Undo栈
+    private MainFrame mainFrame;
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
         init();
+        mainFrame = MainFrame.getInstance();
 		vst = new VersionTree();
 		/*Node的参数：
 		 * 1:存储的具体内容
@@ -72,6 +78,8 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private void init() {  
 	     this.addMouseListener(this);  
 	     this.addCaretListener(this);
+	     this.addMouseWheelListener(this);
+	     
 	     pop = new MyJPopupMenu();  
 	     pop.add(copy = new MyJMenuItem("Copy"));  
 	     pop.add(paste = new MyJMenuItem("Paste"));  
@@ -174,7 +182,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	}
     
     public void mouseClicked(MouseEvent e) {
-    	
+
     }  
    
     public void mouseEntered(MouseEvent e) {  
@@ -194,6 +202,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
    
     public void mouseReleased(MouseEvent e) {  
     }
+
     //获取光标当前字符
     public String getcaretChar() {
 		return caretCharacter;
@@ -222,4 +231,18 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 				e1.printStackTrace();
 			}
 		}
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		// TODO Auto-generated method stub
+		boolean ctrl = mainFrame.getCtrl();
+		//向后滚字体放大
+		if (e.getWheelRotation() == 1 && ctrl) {
+			
+			System.out.println(1);
+		}
+		//向前滚字体缩小
+		if (e.getWheelRotation() == -1 && ctrl) {
+			System.out.println(2);
+		}
+	}
 }
