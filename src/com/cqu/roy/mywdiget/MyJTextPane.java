@@ -1,5 +1,6 @@
 package com.cqu.roy.mywdiget;
 
+import java.awt.Font;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -237,7 +238,13 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		boolean ctrl = mainFrame.getCtrl();
 		//向后滚字体放大
 		if (e.getWheelRotation() == 1 && ctrl) {
-			
+			try {
+				
+				getDocument().getText(0, getDocument().getLength());
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			System.out.println(1);
 		}
 		//向前滚字体缩小

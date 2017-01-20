@@ -11,11 +11,12 @@ import javax.swing.text.StyledDocument;
 
 public class MyFontStyle {
 	private StyledDocument styledDoc;
+	String []fontNames;
 	public MyFontStyle(StyledDocument doc) {
 		// TODO Auto-generated constructor stub
 		this.styledDoc = doc;
 		 // Get Available  Font Family Name
-        String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 //        for(int i = 0; i < fontNames.length;i++){
 //        	System.out.println(fontNames[i]);
 //        }
@@ -47,5 +48,9 @@ public class MyFontStyle {
     
     public StyledDocument getStyleDoc() {
 		return styledDoc;
+	}
+    //用于滚轮放大缩小字体
+    public void setFontSize(int size) {
+        createStyle("Style06", styledDoc, size, 1, 0, 0, Color.black, fontNames[16]);
 	}
 }
