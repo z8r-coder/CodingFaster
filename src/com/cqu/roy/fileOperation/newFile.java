@@ -30,6 +30,7 @@ import com.cqu.roy.mywdiget.MainJpanel;
 //newFile
 public class newFile implements FileOperation{
 	MainFrame mainFrame = MainFrame.getInstance();
+	private Vector<MyLabel> lineVc;
 	@Override
 	public void use(JPanel jp,JScrollPane jsp,JPanel northjp,Vector<Integer> close_id,Vector<Integer> untitled_vc
 			,Vector<String> sequece_name,String currentAreaName,JpathButton currentButton,HashMap<String, MainJpanel> hmTextArea 
@@ -103,8 +104,10 @@ public class newFile implements FileOperation{
 		BoxLayout bLayout = new BoxLayout(linePanel, BoxLayout.Y_AXIS);
 		linePanel.setBackground(new Color(50, 50, 50));
 		linePanel.setLayout(bLayout);
-		linePanel.add(new MyLabel(" 1    "));
-		
+		MyLabel lineLabel = new MyLabel(" 1    ");
+		linePanel.add(lineLabel);
+		lineVc = jtp.getLineLabel();
+		lineVc.add(lineLabel);
 		//设置约束位置
 		mainjp.add(jtp,BorderLayout.CENTER);
 		mainjp.add(linePanel,BorderLayout.WEST);

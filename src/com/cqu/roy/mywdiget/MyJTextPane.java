@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Stack;
+import java.util.Vector;
 
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
@@ -48,7 +49,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private Stack<HashSet<Integer>> RedoStack;//每个文本域映射一个Redo栈
     private Stack<HashSet<Integer>> UndoStack;//每个文本域映射一个Undo栈
     private MainFrame mainFrame;
-    private int FontSize;
+    private int FontSize;//文本域中字体大小
+    private int labelFontSize;//行号标签中字体大小
+    private Vector<MyLabel> labelVc;//行号集合
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
@@ -68,7 +71,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		currentNodeSet.add(firstNode);//当前字节点
 		RedoStack = new Stack<>();
 		UndoStack = new Stack<>();
+		labelVc = new Vector<>();
 		FontSize = 15;//字体大小初始值为15
+		labelFontSize = 16;//标签中的字体大小初始值为16
 	}
     public VersionTree getVersionTree() {
 		return vst;
@@ -78,6 +83,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	}
     public Stack<HashSet<Integer>> getUndoStack() {
 		return UndoStack;
+	}
+    public int getLabelFontSize() {
+		return labelFontSize;
 	}
     private void init() {  
 	     this.addMouseListener(this);  
@@ -125,6 +133,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	    	 this.cut();  
 	     }  
     }  
+    public Vector<MyLabel> getLineLabel() {
+		return labelVc;
+	}
     //行号维护
     public void line() {
 		line++;
@@ -240,8 +251,6 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		// TODO Auto-generated method stub
 		StyledDocument document = getStyledDocument();
 		MyFontStyle myFontStyle = new MyFontStyle(document);
-//		document = myFontStyle.getStyleDoc();
-//		setStyledDocument(document);
 		boolean ctrl = mainFrame.getCtrl();
 		//向后滚字体放大
 		if (e.getWheelRotation() == 1 && ctrl) {
@@ -254,7 +263,12 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 				getDocument().insertString(0, text, document.getStyle("Style06"));
 				document.setLogicalStyle(3, document.getStyle("Style06"));
 				setStyledDocument(document);
-		
+				
+				labelFontSize = labelFontSize + 3;
+				for(int i = 0;i < labelVc.size();i++){
+					MyLabel lineLabel = labelVc.get(i);
+					lineLabel.transformTheSize(labelFontSize);
+				}
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -264,10 +278,15 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		//向前滚字体缩小
 		if (e.getWheelRotation() == -1 && ctrl) {
 			//System.out.println(2);
-			if (FontSize - 3 > 0) {
+			if (FontSize - 3 > 5) {
 				FontSize = FontSize - 3;
 			}else {
-				FontSize = 1;//下限为1
+				FontSize = 5;//下限为1
+			}
+			if (labelFontSize - 3 > 5) {
+				labelFontSize = labelFontSize - 3;
+			}else {
+				labelFontSize = 5;//下限为1
 			}
 			myFontStyle.setFontSize(FontSize);
 			document = myFontStyle.getStyleDoc();
@@ -277,6 +296,11 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 				getDocument().insertString(0, text, document.getStyle("Style06"));
 				document.setLogicalStyle(3, document.getStyle("Style06"));
 				setStyledDocument(document);
+				
+				for(int i = 0; i < labelVc.size(); i++){
+					MyLabel lineLabel = labelVc.get(i);
+					lineLabel.transformTheSize(labelFontSize);
+				}
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

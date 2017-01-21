@@ -70,6 +70,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private ArrayList<Node> currentNodeSet;//当前显示集合
 	private Thread timer;
 	private HashSet<Integer> modifiedLine;//修改过的行
+	private Vector<MyLabel> LineNumVc;//行号集合
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
@@ -88,6 +89,8 @@ public class SyntaxHighlighter implements DocumentListener{
 		this.jtp = jtp;
 		//获取当前节点集合
 		vst = jtp.getVersionTree();
+		//获取行号集合
+		LineNumVc = jtp.getLineLabel();
 		currentNodeSet = vst.getCurrentNodeSet();//当前显示内容集合
 		modifiedLine = new HashSet<>();
 		TimerSchedule ts = new TimerSchedule(true, jtp, modifiedLine);
@@ -271,6 +274,7 @@ public class SyntaxHighlighter implements DocumentListener{
 				JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 				MyLabel jLabel = new MyLabel(" " + hm_textPane.get(mainFrame.getCurrentAreaName())
 				.getTextPane().getLine());
+				LineNumVc.add(jLabel);//行号集合
 				linePanel.add(jLabel);
 			}
 		} catch (BadLocationException e3) {
@@ -346,7 +350,6 @@ public class SyntaxHighlighter implements DocumentListener{
 			}
 		});
 		preChar = curChar;//将当前字符赋值为前一个字符，在remove更新的时候用
-		System.out.println(jtp.getCaretPosition());
 //			try {
 //				
 //				if (jtp.getCaretPosition() > 0) {
@@ -362,11 +365,12 @@ public class SyntaxHighlighter implements DocumentListener{
 			vst.removeNode(temp_lineNum);//将该行的第一代节点移除
 			currentNodeSet.remove(temp_lineNum);//将该行显示节点移除
 			
-			System.out.println(temp_lineNum);
 			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();
 			JPanel linepane = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 			int lineCount = hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine();
+			System.out.println(lineCount);
+			LineNumVc.remove(lineCount);
 			linepane.remove(lineCount);
 			linepane.updateUI();
 		}

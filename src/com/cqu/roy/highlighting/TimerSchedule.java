@@ -72,6 +72,12 @@ public class TimerSchedule implements Runnable{
 			Iterator<Integer> iterator = modified.iterator();
 			if (isModified) {
 				synchronized (this) {
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					while(iterator.hasNext()){
 						int currentLine = (int)iterator.next();
 						Node node = currentNode.get(currentLine);
