@@ -26,7 +26,7 @@ public class MyFontStyle {
         createStyle("Style03", styledDoc, 25, 1, 0, 0, Color.BLUE, "隶书");
         createStyle("Style04", styledDoc, 18, 1, 0, 0, new Color(0, 128, 128), fontNames[0]);
         createStyle("Style05", styledDoc, 20, 0, 1, 0, new Color(128, 128, 0), fontNames[7]);
-        createStyle("Style06", styledDoc, 15, 1, 0, 0, Color.black, fontNames[16]);
+        createStyle("Style06", styledDoc, 15, 1, 0, 0, Color.white, fontNames[16]);
         createStyle("Style07", styledDoc, 18, 1, 1, 0, Color.RED, "华文彩云");
 	}
     public void createStyle(String style, StyledDocument doc, int size, 
@@ -51,6 +51,6 @@ public class MyFontStyle {
 	}
     //用于滚轮放大缩小字体
     public void setFontSize(int size) {
-        createStyle("Style06", styledDoc, size, 1, 0, 0, Color.black, fontNames[16]);
+        createStyle("Style06", styledDoc, size, 1, 0, 0, Color.white, fontNames[16]);
 	}
 }

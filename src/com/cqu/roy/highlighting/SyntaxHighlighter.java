@@ -347,15 +347,15 @@ public class SyntaxHighlighter implements DocumentListener{
 		});
 		preChar = curChar;//将当前字符赋值为前一个字符，在remove更新的时候用
 		System.out.println(jtp.getCaretPosition());
-			try {
-				
-				if (jtp.getCaretPosition() > 0) {
-					curChar = jtp.getDocument().getText(jtp.getCaretPosition() - 1, 1);
-				}
-			} catch (BadLocationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+//			try {
+//				
+//				if (jtp.getCaretPosition() > 0) {
+//					curChar = jtp.getDocument().getText(jtp.getCaretPosition() - 1, 1);
+//				}
+//			} catch (BadLocationException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
 		//当退格掉的是换行符的时候
 		if (preChar.equals("\n")) {
 			int temp_lineNum = jtp.getCaretLine();//删除掉的行

@@ -22,6 +22,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 
 import com.cqu.roy.editOperation.Undo;
 import com.cqu.roy.fileOperation.newFile;
@@ -47,6 +48,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private Stack<HashSet<Integer>> RedoStack;//每个文本域映射一个Redo栈
     private Stack<HashSet<Integer>> UndoStack;//每个文本域映射一个Undo栈
     private MainFrame mainFrame;
+    private int FontSize;
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
@@ -66,6 +68,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		currentNodeSet.add(firstNode);//当前字节点
 		RedoStack = new Stack<>();
 		UndoStack = new Stack<>();
+		FontSize = 15;//字体大小初始值为15
 	}
     public VersionTree getVersionTree() {
 		return vst;
@@ -235,21 +238,49 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		// TODO Auto-generated method stub
+		StyledDocument document = getStyledDocument();
+		MyFontStyle myFontStyle = new MyFontStyle(document);
+//		document = myFontStyle.getStyleDoc();
+//		setStyledDocument(document);
 		boolean ctrl = mainFrame.getCtrl();
 		//向后滚字体放大
 		if (e.getWheelRotation() == 1 && ctrl) {
+			FontSize = FontSize + 3;
+			myFontStyle.setFontSize(FontSize);
+			document = myFontStyle.getStyleDoc();
 			try {
-				
-				getDocument().getText(0, getDocument().getLength());
+				String text = getDocument().getText(0, getDocument().getLength());
+				getDocument().remove(0, getDocument().getLength());
+				getDocument().insertString(0, text, document.getStyle("Style06"));
+				document.setLogicalStyle(3, document.getStyle("Style06"));
+				setStyledDocument(document);
+		
 			} catch (BadLocationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			System.out.println(1);
+			//System.out.println(1);
 		}
 		//向前滚字体缩小
 		if (e.getWheelRotation() == -1 && ctrl) {
-			System.out.println(2);
+			//System.out.println(2);
+			if (FontSize - 3 > 0) {
+				FontSize = FontSize - 3;
+			}else {
+				FontSize = 1;//下限为1
+			}
+			myFontStyle.setFontSize(FontSize);
+			document = myFontStyle.getStyleDoc();
+			try {
+				String text = getDocument().getText(0, getDocument().getLength());
+				getDocument().remove(0, getDocument().getLength());
+				getDocument().insertString(0, text, document.getStyle("Style06"));
+				document.setLogicalStyle(3, document.getStyle("Style06"));
+				setStyledDocument(document);
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
 }
