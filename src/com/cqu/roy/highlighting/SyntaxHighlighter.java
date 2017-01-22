@@ -360,6 +360,7 @@ public class SyntaxHighlighter implements DocumentListener{
 //				e1.printStackTrace();
 //			}
 		//当退格掉的是换行符的时候
+		Thread.yield();
 		if (preChar.equals("\n")) {
 			int temp_lineNum = jtp.getCaretLine();//删除掉的行
 			vst.removeNode(temp_lineNum);//将该行的第一代节点移除

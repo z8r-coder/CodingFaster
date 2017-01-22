@@ -52,6 +52,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private int FontSize;//文本域中字体大小
     private int labelFontSize;//行号标签中字体大小
     private Vector<MyLabel> labelVc;//行号集合
+    private volatile boolean isWheelMove;
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
@@ -74,7 +75,8 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		labelVc = new Vector<>();
 		FontSize = 15;//字体大小初始值为15
 		labelFontSize = 16;//标签中的字体大小初始值为16
-	}
+		isWheelMove = false;
+    }
     public VersionTree getVersionTree() {
 		return vst;
 	}
@@ -86,6 +88,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	}
     public int getLabelFontSize() {
 		return labelFontSize;
+	}
+    public boolean getIsWheelMove() {
+		return isWheelMove;
 	}
     private void init() {  
 	     this.addMouseListener(this);  
@@ -260,6 +265,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 			try {
 				String text = getDocument().getText(0, getDocument().getLength());
 				getDocument().remove(0, getDocument().getLength());
+				isWheelMove = true;//判断是否是滑轮引起的插入删除操作
 				getDocument().insertString(0, text, document.getStyle("Style06"));
 				document.setLogicalStyle(3, document.getStyle("Style06"));
 				setStyledDocument(document);
