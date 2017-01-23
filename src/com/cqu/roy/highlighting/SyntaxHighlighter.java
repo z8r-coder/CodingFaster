@@ -257,6 +257,7 @@ public class SyntaxHighlighter implements DocumentListener{
 					
 			//当新输入的字符是换行符的时候，执行行号显示，和版本树节点创建
 			if (newLine.equals("\n")) {
+				//jtp.line();//最大行+1
 				TextInfo currentLineText = getCurrentLineText(jtp.getCaretPosition(),
 						e.getDocument().getText(e.getOffset(), 1));
 				int temp_line = jtp.getCaretLine() + 1;//光标所在行号
@@ -375,6 +376,7 @@ public class SyntaxHighlighter implements DocumentListener{
 //			}
 		//当退格掉的是换行符的时候
 		if (preChar.equals("\n")) {
+			//jtp.back();//最大行-1
 			int temp_lineNum = jtp.getCaretLine();//删除掉的行
 			vst.removeNode(temp_lineNum);//将该行的第一代节点移除
 			currentNodeSet.remove(temp_lineNum);//将该行显示节点移除

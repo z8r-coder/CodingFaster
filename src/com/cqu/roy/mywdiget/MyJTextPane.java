@@ -39,7 +39,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	
     private MyJPopupMenu pop = null; // 弹出菜单  
     private MyJMenuItem copy = null, paste = null, cut = null; // 三个功能菜单  
-    private int line = 1;
+    private int line = 1;//该文本中最大行
     private int caretLineNum = 0;
     private String caretCharacter;//光标当前字符
     private String preCharacter;//光标前一个字符

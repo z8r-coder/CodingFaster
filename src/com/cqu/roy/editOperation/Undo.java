@@ -90,7 +90,9 @@ public class Undo implements FileOperation{
 				e.printStackTrace();
 			}
 			//将当前节点集合赋为前一节点的父节点
-			currentNodeSet.set(lineNum, parentNode);
+			if (lineNum < jtp.getLine()) {
+				currentNodeSet.set(lineNum, parentNode);
+			}
 		}
 		//将Undo栈中pop的元素，压栈Redo
 		RedoStack.push(modified);

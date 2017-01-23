@@ -87,7 +87,9 @@ public class Redo implements FileOperation{
 				e.printStackTrace();
 			}
 			//重新设置节点集合
-			currentNodeSet.set(lineNum, sub_node);
+			if (lineNum < jtp.getLine()) {
+				currentNodeSet.set(lineNum, sub_node);
+			}
 		}	
 		//将Redo栈中pop出的元素，压栈入Undo栈
 		UndoStack.push(modified);
