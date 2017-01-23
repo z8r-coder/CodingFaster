@@ -52,7 +52,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private int FontSize;//文本域中字体大小
     private int labelFontSize;//行号标签中字体大小
     private Vector<MyLabel> labelVc;//行号集合
-    private volatile boolean isWheelMove;
+    private volatile boolean isWheelMove;//滚轮执行的插入信息
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
@@ -91,6 +91,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	}
     public boolean getIsWheelMove() {
 		return isWheelMove;
+	}
+    public void setIsWheelMove(boolean isWheelMove) {
+		this.isWheelMove = isWheelMove;
 	}
     private void init() {  
 	     this.addMouseListener(this);  
@@ -257,6 +260,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		StyledDocument document = getStyledDocument();
 		MyFontStyle myFontStyle = new MyFontStyle(document);
 		boolean ctrl = mainFrame.getCtrl();
+		isWheelMove = true;//判断是否是滑轮引起的插入删除操作
 		//向后滚字体放大
 		if (e.getWheelRotation() == 1 && ctrl) {
 			FontSize = FontSize + 3;
@@ -265,7 +269,6 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 			try {
 				String text = getDocument().getText(0, getDocument().getLength());
 				getDocument().remove(0, getDocument().getLength());
-				isWheelMove = true;//判断是否是滑轮引起的插入删除操作
 				getDocument().insertString(0, text, document.getStyle("Style06"));
 				document.setLogicalStyle(3, document.getStyle("Style06"));
 				setStyledDocument(document);
@@ -312,5 +315,6 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 				e1.printStackTrace();
 			}
 		}
+		
 	}
 }

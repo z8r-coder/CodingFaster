@@ -194,6 +194,11 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
+		//若是放大缩小字体引起的插入删除操作，则直接退出
+		if (jtp.getIsWheelMove()) {
+			jtp.setIsWheelMove(false);
+			return;
+		}
 		try {
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
@@ -332,7 +337,10 @@ public class SyntaxHighlighter implements DocumentListener{
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
-
+		if (jtp.getIsWheelMove()) {
+			jtp.setIsWheelMove(false);
+			return;
+		}
 		jtp.addCaretListener(new CaretListener() {
 			//光标监听，退格键删除的那个字符为preChar;
 			//curChar预读的字符
@@ -360,7 +368,6 @@ public class SyntaxHighlighter implements DocumentListener{
 //				e1.printStackTrace();
 //			}
 		//当退格掉的是换行符的时候
-		Thread.yield();
 		if (preChar.equals("\n")) {
 			int temp_lineNum = jtp.getCaretLine();//删除掉的行
 			vst.removeNode(temp_lineNum);//将该行的第一代节点移除
