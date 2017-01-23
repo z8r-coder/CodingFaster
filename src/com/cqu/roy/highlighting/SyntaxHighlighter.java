@@ -34,6 +34,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import org.omg.IOP.TAG_MULTIPLE_COMPONENTS;
+
 import com.cqu.roy.historyStorage.Node;
 import com.cqu.roy.historyStorage.TextInfo;
 import com.cqu.roy.historyStorage.VersionTree;
@@ -71,6 +73,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	private Thread timer;
 	private HashSet<Integer> modifiedLine;//修改过的行
 	private Vector<MyLabel> LineNumVc;//行号集合
+	private TimerSchedule ts;
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
@@ -93,7 +96,7 @@ public class SyntaxHighlighter implements DocumentListener{
 		LineNumVc = jtp.getLineLabel();
 		currentNodeSet = vst.getCurrentNodeSet();//当前显示内容集合
 		modifiedLine = new HashSet<>();
-		TimerSchedule ts = new TimerSchedule(true, jtp, modifiedLine);
+		ts = new TimerSchedule(true, jtp, modifiedLine);
 		timer = new Thread(ts);
 		timer.start();
 		try {
@@ -195,6 +198,7 @@ public class SyntaxHighlighter implements DocumentListener{
 	public void insertUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
 		//若是放大缩小字体引起的插入删除操作，则直接退出
+		jtp.setIsFinished(false);
 		if (jtp.getIsWheelMove()) {
 			jtp.setIsWheelMove(false);
 			return;
@@ -257,7 +261,7 @@ public class SyntaxHighlighter implements DocumentListener{
 						e.getDocument().getText(e.getOffset(), 1));
 				int temp_line = jtp.getCaretLine() + 1;//光标所在行号
 				Node node = new Node(currentLineText, temp_line, -1,
-						-1, null, null);
+						-1, null, null,jtp.getCaretPosition());
 				vst.InsertNode(temp_line, node);
 				currentNodeSet.add(temp_line, node);
 				//在中间插入，重新设置后面的所有行号
@@ -331,12 +335,14 @@ public class SyntaxHighlighter implements DocumentListener{
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
+		jtp.setIsFinished(true);
 	}
 	
 	//删除更新
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// TODO Auto-generated method stub
+		jtp.setIsFinished(false);
 		if (jtp.getIsWheelMove()) {
 			jtp.setIsWheelMove(false);
 			return;
@@ -409,6 +415,7 @@ public class SyntaxHighlighter implements DocumentListener{
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
+		jtp.setIsFinished(true);
 	}
 
 	@Override

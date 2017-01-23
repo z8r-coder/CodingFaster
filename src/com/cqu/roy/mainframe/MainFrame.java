@@ -163,7 +163,6 @@ public class MainFrame extends JFrame implements ActionListener{
 		initFileMenu();
 		initEditMenu();
 		setJMenuBar(bar);
-		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 1, -1, -1, null, null);
 		/*全局键盘监听*/
 		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
 			

@@ -10,8 +10,9 @@ public class Node {
 	private int previousLineCount;//上一个操作的行号，前提是该节点的上一个节点非根节点
 	private Node ParentNode;//父节点
 	private Node SubNode;//子节点
+	private int caretPosition;//光标的位置
 	public Node(TextInfo textInfo,int lineNumber,int nextLineCount,int previousLineCount
-			,Node parentNode,Node SubNode) {
+			,Node parentNode,Node SubNode,int caretPosition) {
 		// TODO Auto-generated constructor stub
 		this.textinfo = textInfo;
 		this.lineNumber = lineNumber;
@@ -19,6 +20,7 @@ public class Node {
 		this.previousLineCount = previousLineCount;
 		this.SubNode = SubNode;
 		this.ParentNode = parentNode;
+		this.caretPosition = caretPosition;
 	}
 	
 	public void setParentNode(Node ParentNode) {
@@ -86,5 +88,11 @@ public class Node {
 	}
 	public int getPreviousLineCount() {
 		return previousLineCount;
+	}
+	public void setCaretPosition(int caretPosition) {
+		this.caretPosition = caretPosition;
+	}
+	public int getCaretPosition() {
+		return caretPosition;
 	}
 }

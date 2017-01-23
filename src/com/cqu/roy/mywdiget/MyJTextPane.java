@@ -53,6 +53,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private int labelFontSize;//行号标签中字体大小
     private Vector<MyLabel> labelVc;//行号集合
     private volatile boolean isWheelMove;//滚轮执行的插入信息
+    private volatile boolean isFinished;//插入删除操作是否完成，能否被中断
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
@@ -62,11 +63,12 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		/*Node的参数：
 		 * 1:存储的具体内容
 		 * 2：存储的行号位置
-		 * 3：下一个操作的行号，若下一个节点不存在，则为-1
-		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1
+		 * 3：下一个操作的行号，若下一个节点不存在，则为-1，该参数暂时不用
+		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1，该参数暂时不用
 		 * 5：指向父节点的指针
-		 * 6：指向子节点的指针*/
-		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 0, -1, -1, null, null);
+		 * 6：指向子节点的指针
+		 * 7:光标的位置*/
+		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 0, -1, -1, null, null,0);
 		vst.InsertNode(0, firstNode);//第一代子节点
 		currentNodeSet = vst.getCurrentNodeSet();
 		currentNodeSet.add(firstNode);//当前字节点
@@ -76,6 +78,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		FontSize = 15;//字体大小初始值为15
 		labelFontSize = 16;//标签中的字体大小初始值为16
 		isWheelMove = false;
+		isFinished = true;
     }
     public VersionTree getVersionTree() {
 		return vst;
@@ -94,6 +97,12 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	}
     public void setIsWheelMove(boolean isWheelMove) {
 		this.isWheelMove = isWheelMove;
+	}
+    public boolean getIsFinished() {
+		return isFinished;
+	}
+    public void setIsFinished(boolean isFinished) {
+		this.isFinished = isFinished;
 	}
     private void init() {  
 	     this.addMouseListener(this);  

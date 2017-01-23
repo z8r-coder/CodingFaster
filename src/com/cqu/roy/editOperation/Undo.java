@@ -79,10 +79,12 @@ public class Undo implements FileOperation{
 			int parent_startPosition = parentNode.getText().getStartPostion();
 			String parent_text = parentNode.getText().getText();
 			int parent_length = parentNode.getText().getLength();
+			int caretPosition = parentNode.getCaretPosition();
 			try {
 				jtp.getDocument().remove(node_startPosition, node_length);
 				jtp.getDocument().insertString(parent_startPosition, parent_text
 						, document.getStyle("Style06"));
+				jtp.setCaretPosition(caretPosition);
 			} catch (BadLocationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -92,6 +94,6 @@ public class Undo implements FileOperation{
 		}
 		//将Undo栈中pop的元素，压栈Redo
 		RedoStack.push(modified);
-		System.out.println("here is undo");
+		System.out.println(UndoStack.size());
 	}
 }

@@ -70,14 +70,7 @@ public class TimerSchedule implements Runnable{
 				e.printStackTrace();
 			}
 			Iterator<Integer> iterator = modified.iterator();
-			if (isModified) {
-				synchronized (this) {
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			if (jtp.getIsFinished()) {
 					while(iterator.hasNext()){
 						int currentLine = (int)iterator.next();
 						Node node = currentNode.get(currentLine);
@@ -91,7 +84,8 @@ public class TimerSchedule implements Runnable{
 							TextInfo textInfo2 = new TextInfo(content, startPostion, 
 									startPostion + content.length(), content.length());
 							//新生成的节点
-							Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
+							Node nextNode = new Node(textInfo2, currentLine, -1, -1
+									, parentNode, null,jtp.getCaretPosition());
 							if (parentNode.getSubNode() != null) {
 								//若父节点还存在子节点
 								Node subNode = parentNode.getSubNode();
@@ -109,7 +103,8 @@ public class TimerSchedule implements Runnable{
 							TextInfo textInfo2 = new TextInfo(content, startPostion, 
 									startPostion + content.length(), content.length());
 							//新生成的节点
-							Node nextNode = new Node(textInfo2, currentLine, -1, -1, parentNode, null);
+							Node nextNode = new Node(textInfo2, currentLine, -1
+									, -1, parentNode, null,jtp.getCaretPosition());
 							if (parentNode.getSubNode() != null) {
 								//若父节点还存在子节点
 								Node subNode = parentNode.getSubNode();
@@ -123,7 +118,6 @@ public class TimerSchedule implements Runnable{
 							currentNode.set(currentLine, nextNode);
 						}
 					}
-				}
 			}
 //			for(int i = 0; i < currentNode.size();i++){
 //				System.out.println(currentNode.get(i).getText().getText());

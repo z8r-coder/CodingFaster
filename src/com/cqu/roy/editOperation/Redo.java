@@ -30,10 +30,6 @@ public class Redo implements FileOperation{
 	private MyJTextPane jtp;
 	private VersionTree vst;
 	private ArrayList<Node> currentNodeSet;
-	public Redo() {
-		// TODO Auto-generated constructor stub
-		RedoStack = new Stack<>();
-	}
 	@Override
 	public void use(JPanel jp, JScrollPane jsp, JPanel northjp, Vector<Integer> close_id, Vector<Integer> untitled_vc,
 			Vector<String> sequece_name, String currentAreaName, JpathButton currentButton,
@@ -80,10 +76,12 @@ public class Redo implements FileOperation{
 			//其子节点属性
 			int sub_startPosition = sub_node.getText().getStartPostion();
 			String sub_text = sub_node.getText().getText();
+			int sub_caretPosition = sub_node.getCaretPosition();
 			try {
 				jtp.getDocument().remove(current_startPositon, current_length);
 				jtp.getDocument().insertString(sub_startPosition, sub_text
 						, document.getStyle("Style06"));
+				jtp.setCaretPosition(sub_caretPosition);
 			} catch (BadLocationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -93,7 +91,7 @@ public class Redo implements FileOperation{
 		}	
 		//将Redo栈中pop出的元素，压栈入Undo栈
 		UndoStack.push(modified);
-		System.out.println("here is Redo");
+		//System.out.println("here is Redo");
 	}
 
 }
