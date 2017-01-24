@@ -1,7 +1,8 @@
 package com.cqu.roy.historyStorage;
 
 import java.util.ArrayList;
-
+//第一种history策略，使用版本树，一行一行的存储，在undo redo的时候，计算position和同步都存在一定的问题
+//Node,Root,TextInfo,VersionTree，为该策略使用到的类
 public class VersionTree {
 	private Root root;
 	private ArrayList<Node> subNodeSet;//第一代版本

@@ -17,6 +17,7 @@ import com.cqu.roy.attribute.TextAtrr;
 import com.cqu.roy.fileOperation.FileOperation;
 import com.cqu.roy.historyStorage.Node;
 import com.cqu.roy.historyStorage.VersionTree;
+import com.cqu.roy.historyStorage.historyInfo;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MainJpanel;
@@ -24,8 +25,12 @@ import com.cqu.roy.mywdiget.MyFontStyle;
 import com.cqu.roy.mywdiget.MyJTextPane;
 
 public class Redo implements FileOperation{
-	private Stack<HashSet<Integer>> RedoStack;
-	private Stack<HashSet<Integer>> UndoStack;
+	//版本树策略的栈
+	private Stack<HashSet<Integer>> RedoStack_vst;
+	private Stack<HashSet<Integer>> UndoStack_vst;
+	//文本策略的栈
+	private Stack<historyInfo> RedoStack_text;
+	private Stack<historyInfo> UndoStack_text;
 	private MainFrame mainFrame;
 	private MyJTextPane jtp;
 	private VersionTree vst;
@@ -43,13 +48,19 @@ public class Redo implements FileOperation{
 		}else {
 			return;
 		}
+		//版本树策略
+		//versionTreeStrategy();
+		//文本策略
+		textStrategy();
+	}
+	public void versionTreeStrategy() {
 		vst = jtp.getVersionTree();//版本树
 		currentNodeSet = vst.getCurrentNodeSet();//当前版本节点集合
-		RedoStack = jtp.getRedoStack();
-		UndoStack = jtp.getUndoStack();
+		RedoStack_vst = jtp.getRedoStack_vst();
+		UndoStack_vst = jtp.getUndoStack_vst();
 		HashSet<Integer> modified = null;
-		if (!RedoStack.isEmpty()) {
-			modified = RedoStack.pop();
+		if (!RedoStack_vst.isEmpty()) {
+			modified = RedoStack_vst.pop();
 		}else {
 			return;
 		}
@@ -92,8 +103,42 @@ public class Redo implements FileOperation{
 			}
 		}	
 		//将Redo栈中pop出的元素，压栈入Undo栈
-		UndoStack.push(modified);
+		UndoStack_vst.push(modified);
 		//System.out.println("here is Redo");
 	}
-
+	public void textStrategy() {
+		RedoStack_text = jtp.getRedoStack_text();
+		UndoStack_text = jtp.getUndoStack_text();
+		
+		//文本样式
+		StyledDocument document = jtp.getStyledDocument();
+		MyFontStyle myFontStyle = new MyFontStyle(document);
+		document = myFontStyle.getStyleDoc();
+		jtp.setStyledDocument(document);
+		//获取下一个历史
+		historyInfo hif = null;
+		if (!RedoStack_text.isEmpty()) {
+			//若栈内非空
+			hif = RedoStack_text.pop();
+		}else {
+			//栈空则直接结束
+			return;
+		}
+		
+		String textStr = hif.getTextInfo();
+		int caretPosition = hif.getCaretPosition();
+		
+		try {
+			jtp.getDocument().remove(0, jtp.getDocument().getLength());
+			jtp.getDocument().insertString(0, textStr, document.getStyle("Style06"));
+			jtp.setCaretPosition(caretPosition);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//将当前History信息压如Undo栈
+		UndoStack_text.push(jtp.getHistoryInfo());
+		//并将弹出来的history设置成jtp的当前history
+		jtp.setHistoryInfo(hif);
+	}
 }

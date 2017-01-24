@@ -17,6 +17,7 @@ import com.cqu.roy.fileOperation.FileOperation;
 import com.cqu.roy.highlighting.SyntaxHighlighter;
 import com.cqu.roy.historyStorage.Node;
 import com.cqu.roy.historyStorage.VersionTree;
+import com.cqu.roy.historyStorage.historyInfo;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.JpathButton;
 import com.cqu.roy.mywdiget.MainJpanel;
@@ -25,8 +26,12 @@ import com.cqu.roy.mywdiget.MyJTextPane;
 
 //此只是一个undo操作，具体数据结构在jtp里
 public class Undo implements FileOperation{
-	private Stack<HashSet<Integer>> UndoStack;//Undo栈
-	private Stack<HashSet<Integer>> RedoStack;//Redo栈
+	//版本树策略
+	private Stack<HashSet<Integer>> UndoStack_vst;//Undo栈
+	private Stack<HashSet<Integer>> RedoStack_vst;//Redo栈
+	//整文本策略
+	private Stack<historyInfo> UndoStack_text;
+	private Stack<historyInfo> RedoStack_text;
 	private MainFrame mainFrame;
 	private MyJTextPane jtp;
 	private VersionTree vst;
@@ -44,14 +49,54 @@ public class Undo implements FileOperation{
 		}else {
 			return;
 		}
+		//版本树策略
+		//versionTreeStrategy();
+		//整文本策略
+		textStrategy();
+	}
+	public void textStrategy() {
+		RedoStack_text = jtp.getRedoStack_text();
+		UndoStack_text = jtp.getUndoStack_text();
+		
+		//文本样式
+		StyledDocument document = jtp.getStyledDocument();
+		MyFontStyle myFontStyle = new MyFontStyle(document);
+		document = myFontStyle.getStyleDoc();
+		jtp.setStyledDocument(document);
+		
+		//获取上一个历史
+		historyInfo hif = null;
+		if (!UndoStack_text.isEmpty()) {
+			hif = UndoStack_text.pop();
+		}else {
+			return;
+		}
+		
+		String text = hif.getTextInfo();
+		int caretPosition = hif.getCaretPosition();
+		
+		try {
+			jtp.getDocument().remove(0, jtp.getDocument().getLength());
+			jtp.getDocument().insertString(0, text, document.getStyle("Style06"));
+			jtp.setCaretPosition(caretPosition);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//将当前信息压入Redo栈
+		RedoStack_text.push(jtp.getHistoryInfo());
+		//将文本域当前的history信息设置为hif
+		jtp.setHistoryInfo(hif);
+	}
+	public void versionTreeStrategy() {
 		vst = jtp.getVersionTree();//获取版本树
 		currentNodeSet = vst.getCurrentNodeSet();//获取当前节点集合
 		//获取Redo和Undo栈
-		UndoStack = jtp.getUndoStack();
-		RedoStack = jtp.getRedoStack();
+		UndoStack_vst = jtp.getUndoStack_vst();
+		RedoStack_vst = jtp.getRedoStack_vst();
 		HashSet<Integer> modified = null;
-		if (!UndoStack.isEmpty()) {
-			modified = UndoStack.pop();
+		if (!UndoStack_vst.isEmpty()) {
+			modified = UndoStack_vst.pop();
 		}else {
 			return;
 		}
@@ -95,7 +140,7 @@ public class Undo implements FileOperation{
 			}
 		}
 		//将Undo栈中pop的元素，压栈Redo
-		RedoStack.push(modified);
-		System.out.println(UndoStack.size());
+		RedoStack_vst.push(modified);
+		System.out.println(UndoStack_vst.size());
 	}
 }

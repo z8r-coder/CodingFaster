@@ -31,6 +31,7 @@ import com.cqu.roy.highlighting.SyntaxHighlighter;
 import com.cqu.roy.historyStorage.Node;
 import com.cqu.roy.historyStorage.TextInfo;
 import com.cqu.roy.historyStorage.VersionTree;
+import com.cqu.roy.historyStorage.historyInfo;
 import com.cqu.roy.main.main;
 import com.cqu.roy.mainframe.MainFrame;
 
@@ -46,12 +47,15 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private boolean isChange = false;
     private VersionTree vst;//每个文本域映射一个版本树，将其封装在此类中
     private ArrayList<Node> currentNodeSet;
-    private Stack<HashSet<Integer>> RedoStack;//每个文本域映射一个Redo栈
-    private Stack<HashSet<Integer>> UndoStack;//每个文本域映射一个Undo栈
+    private Stack<HashSet<Integer>> RedoStack_vst;//每个文本域映射一个Redo栈,版本树策略的栈
+    private Stack<HashSet<Integer>> UndoStack_vst;//每个文本域映射一个Undo栈，版本树策略的栈
+    private Stack<historyInfo> RedoStack_text;//整文本的Redo栈
+    private Stack<historyInfo> UndoStack_text;//整文本的Undo栈
     private MainFrame mainFrame;
     private int FontSize;//文本域中字体大小
     private int labelFontSize;//行号标签中字体大小
     private Vector<MyLabel> labelVc;//行号集合
+    private historyInfo hif;
     private volatile boolean isWheelMove;//滚轮执行的插入信息
     private volatile boolean isFinished;//插入删除操作是否完成，能否被中断
     public MyJTextPane() {
@@ -59,21 +63,9 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
         super();  
         init();
         mainFrame = MainFrame.getInstance();
-		vst = new VersionTree();
-		/*Node的参数：
-		 * 1:存储的具体内容
-		 * 2：存储的行号位置
-		 * 3：下一个操作的行号，若下一个节点不存在，则为-1，该参数暂时不用
-		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1，该参数暂时不用
-		 * 5：指向父节点的指针
-		 * 6：指向子节点的指针
-		 * 7:光标的位置*/
-		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 0, -1, -1, null, null,0);
-		vst.InsertNode(0, firstNode);//第一代子节点
-		currentNodeSet = vst.getCurrentNodeSet();
-		currentNodeSet.add(firstNode);//当前字节点
-		RedoStack = new Stack<>();
-		UndoStack = new Stack<>();
+        versionTreeInit();//版本树策略
+		textStrategyInit();//整文本策略
+        
 		labelVc = new Vector<>();
 		FontSize = 15;//字体大小初始值为15
 		labelFontSize = 16;//标签中的字体大小初始值为16
@@ -83,11 +75,17 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     public VersionTree getVersionTree() {
 		return vst;
 	}
-    public Stack<HashSet<Integer>> getRedoStack() {
-		return RedoStack;
+    public Stack<HashSet<Integer>> getRedoStack_vst() {
+		return RedoStack_vst;
 	}
-    public Stack<HashSet<Integer>> getUndoStack() {
-		return UndoStack;
+    public Stack<HashSet<Integer>> getUndoStack_vst() {
+		return UndoStack_vst;
+	}
+    public Stack<historyInfo> getRedoStack_text () {
+		return RedoStack_text;
+	}
+    public Stack<historyInfo> getUndoStack_text() {
+		return UndoStack_text;
 	}
     public int getLabelFontSize() {
 		return labelFontSize;
@@ -103,6 +101,12 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	}
     public void setIsFinished(boolean isFinished) {
 		this.isFinished = isFinished;
+	}
+    public historyInfo getHistoryInfo() {
+		return hif;
+	}
+    public void setHistoryInfo(historyInfo hif) {
+		this.hif = hif;
 	}
     private void init() {  
 	     this.addMouseListener(this);  
@@ -134,6 +138,35 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	     this.add(pop);  
     }  
    
+    private void textStrategyInit(){
+    	RedoStack_text = new Stack<>();
+    	UndoStack_text = new Stack<>();
+    	//当前文本初始化
+    	try {
+			hif = new historyInfo(getDocument().getText(0, getDocument().getLength())
+					, getCaretPosition());
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    private void versionTreeInit(){
+		vst = new VersionTree();
+		/*Node的参数：
+		 * 1:存储的具体内容
+		 * 2：存储的行号位置
+		 * 3：下一个操作的行号，若下一个节点不存在，则为-1，该参数暂时不用
+		 * 4：上一个操作的行号，若上一个节点为根节点，则为-1，该参数暂时不用
+		 * 5：指向父节点的指针
+		 * 6：指向子节点的指针
+		 * 7:光标的位置*/
+		Node firstNode = new Node(new TextInfo(null, 0, 0, 0), 0, -1, -1, null, null,0);
+		vst.InsertNode(0, firstNode);//第一代子节点
+		currentNodeSet = vst.getCurrentNodeSet();
+		currentNodeSet.add(firstNode);//当前字节点
+		RedoStack_vst = new Stack<>();
+		UndoStack_vst = new Stack<>();
+    }
     /** 
     * 菜单动作 
     * @param e 

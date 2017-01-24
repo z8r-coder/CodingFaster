@@ -34,8 +34,8 @@ public class TimerSchedule implements Runnable{
 		this.vst = jtp.getVersionTree();
 		currentNode = vst.getCurrentNodeSet();
 		count = 0;
-		RedoStack = jtp.getRedoStack();
-		UndoStack = jtp.getUndoStack();
+		RedoStack = jtp.getRedoStack_vst();
+		UndoStack = jtp.getUndoStack_vst();
 	}
 	public void setIsModified(boolean isModified) {
 		this.isModified = isModified;
