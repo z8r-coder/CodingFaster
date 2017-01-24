@@ -71,14 +71,22 @@ public class Undo implements FileOperation{
 		}else {
 			return;
 		}
+		//行号显示Pane的刷新
+		HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
+		JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 		
 		String text = hif.getTextInfo();
 		int caretPosition = hif.getCaretPosition();
 		
+		for(int i = 0; i < text.length();i++){
+			
+		}
 		try {
+			jtp.setIsUndoRedo(true);
 			jtp.getDocument().remove(0, jtp.getDocument().getLength());
 			jtp.getDocument().insertString(0, text, document.getStyle("Style06"));
 			jtp.setCaretPosition(caretPosition);
+			jtp.setIsUndoRedo(false);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -124,14 +124,23 @@ public class Redo implements FileOperation{
 			//栈空则直接结束
 			return;
 		}
+		//行号显示Pane的刷新
+		HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
+		JPanel linePanel = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 		
+		//history的具体信息
 		String textStr = hif.getTextInfo();
 		int caretPosition = hif.getCaretPosition();
 		
 		try {
+			jtp.setIsUndoRedo(true);
 			jtp.getDocument().remove(0, jtp.getDocument().getLength());
 			jtp.getDocument().insertString(0, textStr, document.getStyle("Style06"));
 			jtp.setCaretPosition(caretPosition);
+			jtp.setIsUndoRedo(false);
+			for(int i = jtp.getLine() - 1;i >= 0;i--){
+				linePanel.remove(i);
+			}
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

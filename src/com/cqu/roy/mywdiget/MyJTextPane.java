@@ -55,9 +55,10 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private int FontSize;//文本域中字体大小
     private int labelFontSize;//行号标签中字体大小
     private Vector<MyLabel> labelVc;//行号集合
-    private historyInfo hif;
+    private historyInfo hif;//jtp的当前historyInfo
     private volatile boolean isWheelMove;//滚轮执行的插入信息
     private volatile boolean isFinished;//插入删除操作是否完成，能否被中断
+    private boolean isUndoRedo;//是否是Undo Redo操作引发的insert和remove操作
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  
@@ -71,6 +72,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 		labelFontSize = 16;//标签中的字体大小初始值为16
 		isWheelMove = false;
 		isFinished = true;
+		isUndoRedo = false;
     }
     public VersionTree getVersionTree() {
 		return vst;
@@ -107,6 +109,12 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
 	}
     public void setHistoryInfo(historyInfo hif) {
 		this.hif = hif;
+	}
+    public void setIsUndoRedo(boolean isUndoRedo) {
+		this.isUndoRedo = isUndoRedo;
+	}
+    public boolean getIsUndoRedo() {
+		return isUndoRedo;
 	}
     private void init() {  
 	     this.addMouseListener(this);  
@@ -145,6 +153,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     	try {
 			hif = new historyInfo(getDocument().getText(0, getDocument().getLength())
 					, getCaretPosition());
+			setHistoryInfo(hif);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

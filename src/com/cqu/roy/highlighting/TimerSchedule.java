@@ -17,6 +17,7 @@ import com.cqu.roy.mywdiget.MyJTextPane;
 
 //计时器，用于redo undo
 //每1秒记录一次
+//版本树使用的策略，整文本策略使用每五个字符进行一次历史存储
 public class TimerSchedule implements Runnable{
 	private boolean isModified;
 	private MyJTextPane jtp;

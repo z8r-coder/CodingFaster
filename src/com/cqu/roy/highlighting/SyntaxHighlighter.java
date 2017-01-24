@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -39,6 +40,7 @@ import org.omg.IOP.TAG_MULTIPLE_COMPONENTS;
 import com.cqu.roy.historyStorage.Node;
 import com.cqu.roy.historyStorage.TextInfo;
 import com.cqu.roy.historyStorage.VersionTree;
+import com.cqu.roy.historyStorage.historyInfo;
 import com.cqu.roy.main.main;
 import com.cqu.roy.mainframe.MainFrame;
 import com.cqu.roy.mywdiget.MainJpanel;
@@ -74,6 +76,9 @@ public class SyntaxHighlighter implements DocumentListener{
 	private HashSet<Integer> modifiedLine;//修改过的行
 	private Vector<MyLabel> LineNumVc;//行号集合
 	private TimerSchedule ts;
+	private int historyCount;//计数输入多少个字符，每5个字符进行一次History的存储
+	private Stack<historyInfo> UndoStack_text;
+	private StringBuilder sb;//改变的字符串生成器
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
@@ -96,9 +101,17 @@ public class SyntaxHighlighter implements DocumentListener{
 		LineNumVc = jtp.getLineLabel();
 		currentNodeSet = vst.getCurrentNodeSet();//当前显示内容集合
 		modifiedLine = new HashSet<>();
-		ts = new TimerSchedule(true, jtp, modifiedLine);
-		timer = new Thread(ts);
-		timer.start();
+		//在使用版本树进行历史存储的时候，用的策略，每过一段时间，对修改过的行进行刷新
+		///////////////////////////////////////
+//		ts = new TimerSchedule(true, jtp, modifiedLine);
+//		timer = new Thread(ts);
+//		timer.start();
+		/////////////////////
+		//整文本策略
+		historyCount = 0;
+		UndoStack_text = jtp.getUndoStack_text();//Undo 整文本栈
+		sb = new StringBuilder();
+		////////////////////////////////////////////////
 		try {
 			rPlay = new RexPlay(jtp.getDocument().getText(0, jtp.getDocument().getLength()));
 			keyWord = rPlay.getKeyWord();			//获取当前节点集合
@@ -193,6 +206,107 @@ public class SyntaxHighlighter implements DocumentListener{
 		 * 4.长度*/
 		return new TextInfo(content, preahead, lookahead, lookahead - preahead);
 	}
+	//版本树策略
+	//版本树新节点获取
+	private void versionTreeStrategy_nodeGet(DocumentEvent e) {
+		TextInfo currentLineText = null;
+		try {
+			currentLineText = getCurrentLineText(jtp.getCaretPosition(),
+					e.getDocument().getText(e.getOffset(), 1));
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		int temp_line = jtp.getCaretLine() + 1;//光标所在行号
+		Node node = new Node(currentLineText, temp_line, -1,
+				-1, null, null,jtp.getCaretPosition());
+		vst.InsertNode(temp_line, node);
+		currentNodeSet.add(temp_line, node);
+		//在中间插入，重新设置后面的所有行号
+		for(int i = temp_line; i < currentNodeSet.size();i++){
+			currentNodeSet.get(i).setlineNum(i);
+		}
+//		for(int i = 0; i < currentNodeSet.size();i++){
+//			System.out.println(currentNodeSet.get(i).getText().getText());
+//		}
+	}
+	//版本树行号，位置的维护更新
+	public void versionTreeUpdate(String newLine,DocumentEvent e) {
+		int caretLine;
+		//若输入是换行符，则行号加一则正确
+		if (newLine.equals("\n")) {
+			caretLine = jtp.getCaretLine() + 1;
+		}else {
+			caretLine = jtp.getCaretLine();
+		}
+
+		modifiedLine.add(caretLine);
+		//每次修改的时候会产生新的版本节点，使用光标的位置更新其startPosition
+		TextInfo lineText = null;
+		try {
+			lineText = getCurrentLineText(jtp.getCaretPosition(), 
+					e.getDocument().getText(e.getOffset(), 1));
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		int startPosition = lineText.getStartPostion();
+		
+		int lineNum = jtp.getCaretLine();
+		if (lineNum < currentNodeSet.size()) {
+			Node node = currentNodeSet.get(lineNum);
+			node.getText().setStartPosition(startPosition);
+		}
+		//若修改的行数在前面，后面的作出修改的行数已经不能获得更新，因此在此处进行更新
+		Iterator<Integer> iterator = modifiedLine.iterator();
+		while(iterator.hasNext()){
+			int temp_line = (int) iterator.next();
+			//若是行号在当前操作行的下面
+			if (temp_line > lineNum && temp_line < currentNodeSet.size()) {
+				TextInfo textInfo = currentNodeSet.get(temp_line).getText();
+				int curStartPos = textInfo.getStartPostion();
+				curStartPos++;
+				textInfo.setStartPosition(curStartPos);
+			}
+		}
+	}
+
+	public void textStrategy() {
+		//若进行的是Undo Redo操作引发的insert remove操作，则不进行历史存储
+		if (jtp.getIsUndoRedo()) {
+			return;
+		}
+		//每6个字符进行一次历史存储，压如Undo栈
+		historyCount++;
+		if (historyCount == 5) {
+			String textInfo = null;
+			try {
+				textInfo = jtp.getDocument().getText(0, jtp.getDocument().getLength());
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			String textChange = sb.toString();
+			int caretPosition = jtp.getCaretPosition();
+			historyInfo hif = new historyInfo(textInfo, caretPosition,textChange);
+			if (jtp.getHistoryInfo() == null) {
+				jtp.setHistoryInfo(hif);
+			}else {
+				//压入前面的历史
+				UndoStack_text.push(jtp.getHistoryInfo());
+				//并将jtp的当前历史设置为hif
+				jtp.setHistoryInfo(hif);
+			}
+			historyCount = 0;//将值赋为0
+		}else {
+			//
+		}
+	}
+	public void versionTree_remove() {
+		int temp_lineNum = jtp.getCaretLine();//删除掉的行
+		vst.removeNode(temp_lineNum);//将该行的第一代节点移除
+		currentNodeSet.remove(temp_lineNum);//将该行显示节点移除
+	}
 	//插入更新
 	@Override
 	public void insertUpdate(DocumentEvent e) {
@@ -203,6 +317,7 @@ public class SyntaxHighlighter implements DocumentListener{
 			jtp.setIsWheelMove(false);
 			return;
 		}
+/////////////////////////////////////////////////////////////////////////////////////
 		try {
 			try {
 				RexPlay rPlay = new RexPlay(jtp.getDocument().getText(0
@@ -214,64 +329,21 @@ public class SyntaxHighlighter implements DocumentListener{
 				e1.printStackTrace();
 			}
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), e.getLength());
-//			System.out.println("insert:" + e.getOffset());
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
+//////////////////////////////////////////////////////////////////////////////////////////
+		//整文本存储历史策略
+		textStrategy();
+		
 		try {
 			//当前输入一个字符
 			String newLine = e.getDocument().getText(e.getOffset(), 1);
 			curChar = newLine;
-			int caretLine;
-			//若输入是换行符，则行号加一则正确
-			if (newLine.equals("\n")) {
-				caretLine = jtp.getCaretLine() + 1;
-			}else {
-				caretLine = jtp.getCaretLine();
-			}
-
-			modifiedLine.add(caretLine);
-			//System.out.println(caretLine);
-			//每次修改的时候会产生新的版本节点，使用光标的位置更新其startPosition
-			TextInfo lineText = getCurrentLineText(jtp.getCaretPosition(), 
-					e.getDocument().getText(e.getOffset(), 1));
-			int startPosition = lineText.getStartPostion();
-			
-			int lineNum = jtp.getCaretLine();
-			if (lineNum < currentNodeSet.size()) {
-				Node node = currentNodeSet.get(lineNum);
-				node.getText().setStartPosition(startPosition);
-			}
-			//若修改的行数在前面，后面的作出修改的行数已经不能获得更新，因此在此处进行更新
-			Iterator<Integer> iterator = modifiedLine.iterator();
-			while(iterator.hasNext()){
-				int temp_line = (int) iterator.next();
-				//若是行号在当前操作行的下面
-				if (temp_line > lineNum && temp_line < currentNodeSet.size()) {
-					TextInfo textInfo = currentNodeSet.get(temp_line).getText();
-					int curStartPos = textInfo.getStartPostion();
-					curStartPos++;
-					textInfo.setStartPosition(curStartPos);
-				}
-			}
-					
+			//versionTreeUpdate(newLine,e);//版本树位置信息维护，更新	
 			//当新输入的字符是换行符的时候，执行行号显示，和版本树节点创建
 			if (newLine.equals("\n")) {
-				//jtp.line();//最大行+1
-				TextInfo currentLineText = getCurrentLineText(jtp.getCaretPosition(),
-						e.getDocument().getText(e.getOffset(), 1));
-				int temp_line = jtp.getCaretLine() + 1;//光标所在行号
-				Node node = new Node(currentLineText, temp_line, -1,
-						-1, null, null,jtp.getCaretPosition());
-				vst.InsertNode(temp_line, node);
-				currentNodeSet.add(temp_line, node);
-				//在中间插入，重新设置后面的所有行号
-				for(int i = temp_line; i < currentNodeSet.size();i++){
-					currentNodeSet.get(i).setlineNum(i);
-				}
-//				for(int i = 0; i < currentNodeSet.size();i++){
-//					System.out.println(currentNodeSet.get(i).getText().getText());
-//				}
+				//versionTreeStrategy_nodeGet(e);//版本树新节点获得
 				HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 				//当为空时直接return
 				if (hm_textPane.get(mainFrame.getCurrentAreaName()) == null) {
@@ -374,13 +446,15 @@ public class SyntaxHighlighter implements DocumentListener{
 //				// TODO Auto-generated catch block
 //				e1.printStackTrace();
 //			}
-		//当退格掉的是换行符的时候
+		///////////////////////////////////////////////
+		//历史版本存储
+		textStrategy();
+		//当退格掉的是换行符的时候,同时不是Undo Redo引起的插入删除
+		
 		if (preChar.equals("\n")) {
-			//jtp.back();//最大行-1
-			int temp_lineNum = jtp.getCaretLine();//删除掉的行
-			vst.removeNode(temp_lineNum);//将该行的第一代节点移除
-			currentNodeSet.remove(temp_lineNum);//将该行显示节点移除
+			//versionTree_remove();//节点移除
 			
+			//行号删除
 			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
 			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();
 			JPanel linepane = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
@@ -390,6 +464,7 @@ public class SyntaxHighlighter implements DocumentListener{
 			linepane.remove(lineCount);
 			linepane.updateUI();
 		}
+		
 		if (e.getOffset() > 0) {
 			try {
 				String lookahead = e.getDocument().getText(e.getOffset() - 1, 1);
