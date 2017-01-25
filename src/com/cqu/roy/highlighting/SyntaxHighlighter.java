@@ -447,13 +447,15 @@ public class SyntaxHighlighter implements DocumentListener{
 		//历史版本存储
 		textStrategy();
 		//当退格掉的是换行符的时候,同时不是Undo Redo引起的插入删除
-		
-		if (preChar.equals("\n")) {
+//		if (jtp.getIsUndoRedo()) {
+//			jtp.setLine(0);//
+//		}
+		if (preChar.equals("\n") && !jtp.getIsUndoRedo()) {
 			//versionTree_remove();//节点移除
 			
 			//行号删除
 			HashMap<String, MainJpanel> hm_textPane = mainFrame.getHashTextPane();
-			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();
+			hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().back();//维护最大变量
 			JPanel linepane = hm_textPane.get(mainFrame.getCurrentAreaName()).getlinePanel();
 			int lineCount = hm_textPane.get(mainFrame.getCurrentAreaName()).getTextPane().getLine();
 			System.out.println(lineCount);

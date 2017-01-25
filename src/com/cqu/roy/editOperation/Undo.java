@@ -78,15 +78,18 @@ public class Undo implements FileOperation{
 		String text = hif.getTextInfo();
 		int caretPosition = hif.getCaretPosition();
 		
-		for(int i = 0; i < text.length();i++){
-			
-		}
 		try {
 			jtp.setIsUndoRedo(true);
 			jtp.getDocument().remove(0, jtp.getDocument().getLength());
+			for(int i = jtp.getLine() - 1;i > 0;i--){
+				linePanel.remove(i);
+			}
+			jtp.setLine(0);
 			jtp.getDocument().insertString(0, text, document.getStyle("Style06"));
 			jtp.setCaretPosition(caretPosition);
 			jtp.setIsUndoRedo(false);
+			
+
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
