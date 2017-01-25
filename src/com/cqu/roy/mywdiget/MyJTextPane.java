@@ -58,7 +58,7 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     private historyInfo hif;//jtp的当前historyInfo
     private volatile boolean isWheelMove;//滚轮执行的插入信息
     private volatile boolean isFinished;//插入删除操作是否完成，能否被中断
-    private boolean isUndoRedo;//是否是Undo Redo操作引发的insert和remove操作
+    private volatile boolean isUndoRedo;//是否是Undo Redo操作引发的insert和remove操作
     public MyJTextPane() {
 		// TODO Auto-generated constructor stub
         super();  

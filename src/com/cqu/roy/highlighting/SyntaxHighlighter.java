@@ -78,7 +78,6 @@ public class SyntaxHighlighter implements DocumentListener{
 	private TimerSchedule ts;
 	private int historyCount;//计数输入多少个字符，每5个字符进行一次History的存储
 	private Stack<historyInfo> UndoStack_text;
-	private StringBuilder sb;//改变的字符串生成器
 	public SyntaxHighlighter(MyJTextPane jtp) {
 		// TODO Auto-generated constructor stub
 		mainFrame = MainFrame.getInstance();
@@ -110,7 +109,6 @@ public class SyntaxHighlighter implements DocumentListener{
 		//整文本策略
 		historyCount = 0;
 		UndoStack_text = jtp.getUndoStack_text();//Undo 整文本栈
-		sb = new StringBuilder();
 		////////////////////////////////////////////////
 		try {
 			rPlay = new RexPlay(jtp.getDocument().getText(0, jtp.getDocument().getLength()));
@@ -286,9 +284,8 @@ public class SyntaxHighlighter implements DocumentListener{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			String textChange = sb.toString();
 			int caretPosition = jtp.getCaretPosition();
-			historyInfo hif = new historyInfo(textInfo, caretPosition,textChange);
+			historyInfo hif = new historyInfo(textInfo, caretPosition);
 			if (jtp.getHistoryInfo() == null) {
 				jtp.setHistoryInfo(hif);
 			}else {
