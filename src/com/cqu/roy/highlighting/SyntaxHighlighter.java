@@ -285,7 +285,11 @@ public class SyntaxHighlighter implements DocumentListener{
 				e1.printStackTrace();
 			}
 			int caretPosition = jtp.getCaretPosition();
-			historyInfo hif = new historyInfo(textInfo, caretPosition);
+			Vector<MyLabel> LinelabelVc = new Vector<>();
+			for(int i = 1; i < LineNumVc.size();i++){
+				LinelabelVc.add(LinelabelVc.get(i));
+			}
+			historyInfo hif = new historyInfo(textInfo, caretPosition,LinelabelVc);
 			if (jtp.getHistoryInfo() == null) {
 				jtp.setHistoryInfo(hif);
 			}else {

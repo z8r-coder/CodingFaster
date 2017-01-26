@@ -151,8 +151,11 @@ public class MyJTextPane extends JTextPane implements MouseListener,CaretListene
     	UndoStack_text = new Stack<>();
     	//当前文本初始化
     	try {
+    		Vector<MyLabel> lineInfo = new Vector<>();
+    		MyLabel lineLabel = new MyLabel(" 1    ");
+    		lineInfo.add(lineLabel);
 			hif = new historyInfo(getDocument().getText(0, getDocument().getLength())
-					, getCaretPosition());
+					, getCaretPosition(),lineInfo);
 			setHistoryInfo(hif);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
